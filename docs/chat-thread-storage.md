@@ -9,3 +9,6 @@ initialization, and call `save(thread)` after a valid prompt is submitted.
 
 The versioned local-storage key is `tscircuit.chat-threads.v1`. Reads discard
 malformed records so UI code only receives valid, newest-first threads.
+
+The History control expands an in-place rail drawer. It shows the eight newest
+thread titles as their starting messages; selecting one restores its project URL.

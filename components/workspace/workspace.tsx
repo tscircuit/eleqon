@@ -7,6 +7,7 @@ import type { BlogId, BlogPost } from "@/lib/blog";
 import { createChatThread, parseChatThreadTitle, type ChatThread } from "@/lib/chat-thread";
 import { ChatThreadStore } from "@/lib/chat-thread-store";
 import { parseWorkspaceUrlState, serializeWorkspaceUrlState, type DocsUrlState, type HomeTab, type WorkspaceTab, type WorkspaceUrlState } from "@/lib/workspace-url-state";
+import { HistoryDrawer } from "./history-drawer";
 import { ArrowIcon, BoardIcon, CodeIcon, CubeIcon, HistoryIcon, PlusIcon, SchematicIcon } from "./icons";
 import { Brand } from "./brand";
 import styles from "./workspace.module.css";
@@ -25,15 +26,16 @@ const tabs: ReadonlyArray<{ readonly id: WorkspaceTab; readonly label: string; r
 export function Workspace() {
   const [threads, setThreads] = useState<ReadonlyArray<ChatThread>>(() => typeof window === "undefined" ? [] : new ChatThreadStore(window.localStorage).read());
   const [workspaceState, setWorkspaceState] = useState<WorkspaceUrlState>(() => typeof window === "undefined" ? { kind: "home", homeTab: "agent" } : parseWorkspaceUrlState(window.location.search));
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [, startTransition] = useTransition();
 
   useEffect(() => { const restoreWorkspaceState = () => setWorkspaceState(parseWorkspaceUrlState(window.location.search)); window.addEventListener("popstate", restoreWorkspaceState); return () => window.removeEventListener("popstate", restoreWorkspaceState); }, []);
 
   const navigate = (state: WorkspaceUrlState) => { window.history.pushState(null, "", `${window.location.pathname}${serializeWorkspaceUrlState(state)}`); setWorkspaceState(state); };
-  const startThread = () => navigate({ kind: "home", homeTab: "agent" });
+  const startThread = () => { setHistoryOpen(false); navigate({ kind: "home", homeTab: "agent" }); };
   const openBlog = (blogId: BlogId) => navigate({ kind: "home", homeTab: "docs", docs: { kind: "article", blogId } });
   const openBlogs = () => navigate({ kind: "home", homeTab: "docs", docs: { kind: "blogs" } });
-  const selectThread = (thread: ChatThread) => navigate({ kind: "project", threadId: thread.id, activeTab: "code" });
+  const selectThread = (thread: ChatThread) => { setHistoryOpen(false); navigate({ kind: "project", threadId: thread.id, activeTab: "code" }); };
   const submit = (prompt: string) => {
     startTransition(() => {
       const title = parseChatThreadTitle(prompt);
@@ -47,13 +49,16 @@ export function Workspace() {
   const selectedThread = workspaceState.kind === "project" ? threads.find((thread) => thread.id === workspaceState.threadId) : undefined;
 
   return (
-    <div className={styles.workspace} data-view={workspaceState.kind}>
+    <div className={styles.workspace} data-view={workspaceState.kind} data-history-open={historyOpen}>
       {workspaceState.kind === "home" ? <HomeNotch activeTab={workspaceState.homeTab} onSelect={(homeTab) => navigate(homeTab === "agent" ? { kind: "home", homeTab } : { kind: "home", homeTab, docs: { kind: "article", blogId: "tscircuit-framework" } })} /> : null}
-      <nav className={styles.rail} aria-label={enWorkspace.aria.workspaceNavigation}>
-        <Brand className={styles.brand} />
-        <RailButton label={enWorkspace.aria.newChat} icon={<PlusIcon />} onClick={startThread} active={workspaceState.kind === "home"} />
-        <RailButton label={enWorkspace.aria.history} icon={<HistoryIcon />} onClick={() => { const latest = threads[0]; if (latest) selectThread(latest); }} active={workspaceState.kind === "project"} />
-      </nav>
+      <aside className={styles.rail}>
+        <nav className={styles.railControls} aria-label={enWorkspace.aria.workspaceNavigation}>
+          <Brand className={styles.brand} />
+          <RailButton label={enWorkspace.aria.newChat} icon={<PlusIcon />} onClick={startThread} active={workspaceState.kind === "home"} />
+          <HistoryButton open={historyOpen} onClick={() => setHistoryOpen((current) => !current)} />
+        </nav>
+        <HistoryDrawer open={historyOpen} threads={threads} activeThreadId={workspaceState.kind === "project" ? workspaceState.threadId : null} onSelect={selectThread} />
+      </aside>
       <main className={styles.main}>
         {workspaceState.kind === "home" ? workspaceState.homeTab === "agent" ? <Welcome onSubmit={submit} onOpenBlog={openBlog} /> : <DocsPage onSubmit={submit} docs={workspaceState.docs} onOpenBlog={openBlog} onOpenBlogs={openBlogs} /> : (
           <ProjectView activeTab={workspaceState.activeTab} thread={selectedThread} onSubmit={submit} onTab={(activeTab) => navigate({ ...workspaceState, activeTab })} />
@@ -71,6 +76,11 @@ function HomeNotch({ activeTab, onSelect }: { readonly activeTab: HomeTab; reado
 /** Renders a rail navigation control. */
 function RailButton({ label, icon, onClick, active }: { readonly label: string; readonly icon: React.ReactNode; readonly onClick: () => void; readonly active: boolean }) {
   return <button className={styles.railButton} data-active={active} type="button" onClick={onClick} aria-label={label}>{icon}</button>;
+}
+
+/** Toggles the drawer of locally stored chat threads. */
+function HistoryButton({ open, onClick }: { readonly open: boolean; readonly onClick: () => void }) {
+  return <button className={styles.railButton} data-active={open} type="button" onClick={onClick} aria-controls="workspace-history" aria-expanded={open} aria-label={enWorkspace.aria.history}><HistoryIcon /></button>;
 }
 
 /** Renders the first-chat prompt. */

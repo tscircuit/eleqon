@@ -33,6 +33,12 @@ export const enWorkspace = {
   composer: {
     placeholder: "Ask tscircuit agent",
   },
+  history: {
+    title: "Past threads",
+    startingMessage: "Starting message",
+    empty: "Your completed chats will appear here.",
+    visibleThreadCount: 8,
+  },
   symbols: {
     add: "+",
     previous: "←",
