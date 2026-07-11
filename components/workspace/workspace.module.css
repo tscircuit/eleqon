@@ -49,10 +49,10 @@
 .workspace[data-view="welcome"] .send svg { width:28px; height:28px; stroke-width:2; }
 .trendingBlogs { margin-top:32px; }
 .trendingHeading { margin:0 0 14px; color:#e7e7e7; font-size:20px; font-weight:600; letter-spacing:-.02em; }
-.trendingGrid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px; }
-.trendingCard { min-height:124px; border-radius:16px; background:#1b1b1b; padding:18px; }
+.trendingGrid { display:grid; gap:4px; }
+.trendingCard { display:flex; align-items:baseline; justify-content:space-between; gap:24px; padding:10px 0; }
 .trendingTitle { margin:0; color:#e3e3e3; font-size:18px; font-weight:500; letter-spacing:-.02em; line-height:1.35; }
-.trendingClicks { display:block; margin-top:18px; color:#929292; font-size:14px; font-weight:500; }
+.trendingClicks { flex:0 0 auto; color:#929292; font-size:14px; font-weight:500; }
 @keyframes welcome-prompt { 0% { filter:blur(10px); opacity:0; transform:translateY(8px); } 16%, 100% { filter:blur(0); opacity:1; transform:translateY(0); } }
 @media (prefers-reduced-motion:reduce) { .welcomeHeadlineText { animation:none; } }
-@media (max-width:700px) { .workspace { grid-template-columns:1fr; } .rail { position:fixed; z-index:2; right:12px; bottom:12px; top:auto; height:auto; flex-direction:row; border:0; border-radius:16px; padding:7px; background:#181818; } .rail .brand { display:none; } .railButton { width:45px; min-height:42px; } .main { padding:10px; } .frame { min-height:calc(100vh - 20px); border-radius:16px; } .project { grid-template-columns:1fr; padding:12px; } .threadPanel { display:none; } .tabs { overflow:auto; justify-content:flex-start; padding:14px; } .content { padding:0 18px 90px; } .trendingGrid { grid-template-columns:1fr; } }
+@media (max-width:700px) { .workspace { grid-template-columns:1fr; } .rail { position:fixed; z-index:2; right:12px; bottom:12px; top:auto; height:auto; flex-direction:row; border:0; border-radius:16px; padding:7px; background:#181818; } .rail .brand { display:none; } .railButton { width:45px; min-height:42px; } .main { padding:10px; } .frame { min-height:calc(100vh - 20px); border-radius:16px; } .project { grid-template-columns:1fr; padding:12px; } .threadPanel { display:none; } .tabs { overflow:auto; justify-content:flex-start; padding:14px; } .content { padding:0 18px 90px; } }
