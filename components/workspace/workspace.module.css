@@ -8,7 +8,8 @@
 .frame { display:grid; min-height:calc(100vh - 40px); overflow:hidden; border:0; border-radius:22px; background:#141414; }
 .welcome { place-items:center; }
 .composerWrap { width:min(1440px, calc(100% - 96px)); margin-top:-4vh; }
-.eyebrow { display:block; margin:0 0 24px 8px; color:#ececec; font-size:28px; font-weight:600; letter-spacing:-.03em; }
+.welcomeHeadline { min-height:72px; margin:0 0 24px 8px; color:#f2f2f2; font-size:clamp(38px, 3vw, 52px); font-weight:600; letter-spacing:-.045em; line-height:1.15; }
+.welcomeHeadlineText { display:block; animation:welcome-prompt 3s ease-in-out both; }
 .composer { position:relative; border:0; border-radius:22px; background:#1d1d1d; padding:15px 63px 15px 18px; }
 .composer textarea { display:block; width:100%; min-height:78px; resize:none; border:0; outline:0; background:transparent; color:#efefef; font-size:15px; line-height:1.55; }
 .composer textarea::placeholder { color:#6f6f6f; }
@@ -43,4 +44,6 @@
 .workspace[data-view="welcome"] .send { position:static; width:58px; height:58px; border-radius:50%; background:#454545; color:#191919; }
 .workspace[data-view="welcome"] .send:disabled { background:#454545; color:#202020; }
 .workspace[data-view="welcome"] .send svg { width:28px; height:28px; stroke-width:2; }
+@keyframes welcome-prompt { 0% { filter:blur(10px); opacity:0; transform:translateY(8px); } 14%, 82% { filter:blur(0); opacity:1; transform:translateY(0); } 100% { filter:blur(10px); opacity:0; transform:translateY(-8px); } }
+@media (prefers-reduced-motion:reduce) { .welcomeHeadlineText { animation:none; } }
 @media (max-width:700px) { .workspace { grid-template-columns:1fr; } .rail { position:fixed; z-index:2; right:12px; bottom:12px; top:auto; height:auto; flex-direction:row; border:0; border-radius:16px; padding:7px; background:#181818; } .rail .brand { display:none; } .railButton { width:45px; min-height:42px; } .main { padding:10px; } .frame { min-height:calc(100vh - 20px); border-radius:16px; } .project { grid-template-columns:1fr; padding:12px; } .threadPanel { display:none; } .tabs { overflow:auto; justify-content:flex-start; padding:14px; } .content { padding:0 18px 90px; } }

@@ -17,6 +17,12 @@ const tabs: ReadonlyArray<{ readonly id: WorkspaceTab; readonly label: string; r
   { id: "model", label: "3D", icon: CubeIcon },
 ];
 
+const welcomePrompts = [
+  "What are you planning to build with tscircuit today?",
+  "Ask a question about the tscircuit docs.",
+  "Create a new PCB with tscircuit.",
+] as const;
+
 /** Manages local threads and composes the workspace views. */
 export function Workspace() {
   const [threads, setThreads] = useState<ReadonlyArray<ChatThread>>(() => typeof window === "undefined" ? [] : new ChatThreadStore(window.localStorage).read());
@@ -61,7 +67,20 @@ function RailButton({ label, icon, onClick, active }: { readonly label: string; 
 
 /** Renders the first-chat prompt. */
 function Welcome({ onSubmit }: { readonly onSubmit: (prompt: string) => void }) {
-  return <section className={`${styles.frame} ${styles.welcome}`}><div className={styles.composerWrap}><strong className={styles.eyebrow}>What are you planning to build?</strong><Composer onSubmit={onSubmit} /></div></section>;
+  return <section className={`${styles.frame} ${styles.welcome}`}><div className={styles.composerWrap}><WelcomeHeadline /><Composer onSubmit={onSubmit} /></div></section>;
+}
+
+/** Cycles through the welcome prompts at a calm, readable pace. */
+function WelcomeHeadline() {
+  const [promptIndex, setPromptIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setPromptIndex((current) => (current + 1) % welcomePrompts.length), 3000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const prompt = welcomePrompts[promptIndex];
+  return <h1 className={styles.welcomeHeadline}><span key={prompt} className={styles.welcomeHeadlineText}>{prompt}</span></h1>;
 }
 
 /** Renders an active engineering thread. */
