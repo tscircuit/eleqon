@@ -19,7 +19,7 @@ const tabs: ReadonlyArray<{ readonly id: WorkspaceTab; readonly label: string; r
 ];
 
 const welcomePrompts = [
-  "What are you planning to build with tscircuit today?",
+  "What are you planning to build today?",
   "Ask a question about the tscircuit docs.",
   "Create a new PCB with tscircuit.",
 ] as const;
