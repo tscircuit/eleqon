@@ -7,10 +7,8 @@ export type WorkspaceTab = "code" | "pcb" | "schematic" | "model";
 /** A home context that can be reproduced in a home URL. */
 export type HomeTab = "agent" | "docs";
 
-/** The reproducible content shown while the docs home context is active. */
-export type DocsUrlState =
-  | Readonly<{ readonly kind: "index" }>
-  | Readonly<{ readonly kind: "article"; readonly blogId: BlogId }>;
+/** The reproducible article shown while the Docs home context is active. */
+export type DocsUrlState = Readonly<{ readonly kind: "article"; readonly blogId: BlogId }>;
 
 /** The complete shareable workspace state for the small URL-backed prototype. */
 export type WorkspaceUrlState =
@@ -32,7 +30,7 @@ export function parseWorkspaceUrlState(search: string): WorkspaceUrlState {
 
   if (params.get("screen") === "docs" || params.get("context") === "docs") {
     const blogId = parseBlogId(params.get("blog"));
-    return { kind: "home", homeTab: "docs", docs: blogId === null ? { kind: "index" } : { kind: "article", blogId } };
+    return { kind: "home", homeTab: "docs", docs: { kind: "article", blogId: blogId ?? "tscircuit-framework" } };
   }
 
   return { kind: "home", homeTab: "agent" };

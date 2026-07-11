@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { getBlogPost, type BlogId, type BlogPost } from "@/lib/blog";
+import { getBlogPost, getBlogPosts, type BlogId, type BlogPost } from "@/lib/blog";
 import { createChatThread, parseChatThreadTitle, type ChatThread } from "@/lib/chat-thread";
 import { ChatThreadStore } from "@/lib/chat-thread-store";
 import { parseWorkspaceUrlState, serializeWorkspaceUrlState, type HomeTab, type WorkspaceTab, type WorkspaceUrlState } from "@/lib/workspace-url-state";
@@ -80,14 +80,14 @@ export function Workspace() {
 
   return (
     <div className={styles.workspace} data-view={workspaceState.kind}>
-      {workspaceState.kind === "home" ? <HomeNotch activeTab={workspaceState.homeTab} onSelect={(homeTab) => navigate(homeTab === "agent" ? { kind: "home", homeTab } : { kind: "home", homeTab, docs: { kind: "index" } })} /> : null}
+      {workspaceState.kind === "home" ? <HomeNotch activeTab={workspaceState.homeTab} onSelect={(homeTab) => navigate(homeTab === "agent" ? { kind: "home", homeTab } : { kind: "home", homeTab, docs: { kind: "article", blogId: "tscircuit-framework" } })} /> : null}
       <nav className={styles.rail} aria-label="Workspace navigation">
         <Brand className={styles.brand} />
         <RailButton label="New" icon={<PlusIcon />} onClick={startThread} active={workspaceState.kind === "home"} />
         <RailButton label="History" icon={<HistoryIcon />} onClick={() => { const latest = threads[0]; if (latest) selectThread(latest); }} active={workspaceState.kind === "project"} />
       </nav>
       <main className={styles.main}>
-        {workspaceState.kind === "home" ? workspaceState.homeTab === "agent" ? <Welcome onSubmit={submit} onOpenBlog={openBlog} /> : <DocsPage onSubmit={submit} blog={workspaceState.docs.kind === "article" ? getBlogPost(workspaceState.docs.blogId) : undefined} /> : (
+        {workspaceState.kind === "home" ? workspaceState.homeTab === "agent" ? <Welcome onSubmit={submit} onOpenBlog={openBlog} /> : <DocsPage onSubmit={submit} blog={getBlogPost(workspaceState.docs.blogId)} onOpenBlog={openBlog} /> : (
           <ProjectView activeTab={workspaceState.activeTab} thread={selectedThread} onSubmit={submit} onTab={(activeTab) => navigate({ ...workspaceState, activeTab })} />
         )}
       </main>
@@ -165,9 +165,14 @@ function ProjectView({ activeTab, thread, onSubmit, onTab }: { readonly activeTa
   return <section className={`${styles.frame} ${styles.project}`}><ChatColumn thread={thread} onSubmit={onSubmit} /><section className={styles.canvas}><div className={styles.tabs} role="tablist" aria-label="Build artefacts">{tabs.map(({ id, label, icon: Icon }) => <button key={id} className={styles.tab} data-active={activeTab === id} type="button" role="tab" aria-selected={activeTab === id} onClick={() => onTab(id)}><Icon />{label}</button>)}</div><div className={styles.content} /></section></section>;
 }
 
-/** Renders documentation and an optional selected article. */
-function DocsPage({ onSubmit, blog }: { readonly onSubmit: (prompt: string) => void; readonly blog?: BlogPost }) {
-  return <section className={`${styles.frame} ${styles.project} ${styles.docsPage}`}><ChatColumn onSubmit={onSubmit} /><section className={styles.docsCanvas}>{blog ? <BlogArticle key={blog.id} blog={blog} /> : <h1>Docs</h1>}</section></section>;
+/** Renders the Docs navigation and its selected article. */
+function DocsPage({ onSubmit, blog, onOpenBlog }: { readonly onSubmit: (prompt: string) => void; readonly blog: BlogPost; readonly onOpenBlog: (blogId: BlogId) => void }) {
+  return <section className={`${styles.frame} ${styles.project} ${styles.docsPage}`}><ChatColumn onSubmit={onSubmit} /><section className={styles.docsCanvas}><DocsSidebar activeBlogId={blog.id} onOpenBlog={onOpenBlog} /><section className={styles.docsArticlePane}><BlogArticle key={blog.id} blog={blog} /></section></section></section>;
+}
+
+/** Renders the navigation inside the Docs canvas. */
+function DocsSidebar({ activeBlogId, onOpenBlog }: { readonly activeBlogId: BlogId; readonly onOpenBlog: (blogId: BlogId) => void }) {
+  return <nav className={styles.docsSidebar} aria-label="Docs articles"><p className={styles.docsSidebarHeading}>Intro</p><div className={styles.docsNav}>{getBlogPosts().map((blog) => <button key={blog.id} className={styles.docsNavButton} data-active={blog.id === activeBlogId} type="button" onClick={() => onOpenBlog(blog.id)}>{blog.title}</button>)}</div></nav>;
 }
 
 /** Renders a selected article in the docs workspace. */

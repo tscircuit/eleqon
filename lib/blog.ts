@@ -52,9 +52,21 @@ const blogPosts: Readonly<Record<BlogId, BlogPost>> = {
   },
 };
 
+const blogOrder: readonly BlogId[] = [
+  "tscircuit-framework",
+  "pcb-trace-widths",
+  "differential-pairs",
+  "ground-pours",
+];
+
 /** Return the static article represented by a valid identifier. */
 export function getBlogPost(id: BlogId): BlogPost {
   return blogPosts[id];
+}
+
+/** Return the static articles in their Docs navigation order. */
+export function getBlogPosts(): ReadonlyArray<BlogPost> {
+  return blogOrder.map(getBlogPost);
 }
 
 /** Parse one recognized article identifier from a URL boundary. */

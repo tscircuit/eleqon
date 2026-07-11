@@ -30,8 +30,14 @@
 .chatInput .attach { display:none; }
 .chatInput .send { position:static; width:48px; height:48px; }
 .chatInput .send svg { width:24px; height:24px; }
-.docsCanvas { display:grid; min-width:0; place-items:center; border-radius:20px; background:#121212; color:#f0f0f0; }
+.docsCanvas { display:grid; min-width:0; grid-template-columns:minmax(210px, 260px) minmax(0, 1fr); overflow:hidden; border-radius:20px; background:#121212; color:#f0f0f0; }
 .docsCanvas h1 { margin:0; font-size:32px; font-weight:600; letter-spacing:-.03em; }
+.docsSidebar { overflow-y:auto; border-right:1px solid #282828; background:#171717; padding:28px 14px; }
+.docsSidebarHeading { margin:0 0 12px; color:#8d8d8d; font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
+.docsNav { display:grid; gap:4px; }
+.docsNavButton { width:100%; border:0; border-radius:9px; background:transparent; padding:10px 12px; color:#a9a9a9; cursor:pointer; font:inherit; font-size:15px; font-weight:500; line-height:1.35; text-align:left; }
+.docsNavButton:hover, .docsNavButton[data-active="true"] { background:#292929; color:#f0f0f0; }
+.docsArticlePane { min-width:0; overflow-y:auto; background:#121212; }
 .canvas { display:grid; min-width:0; grid-template-rows:auto 1fr; border:0; border-radius:20px; overflow:hidden; background:#121212; }
 .tabs { display:flex; justify-content:flex-end; gap:7px; padding:20px 24px; }
 .tab { display:flex; align-items:center; gap:7px; border:0; border-radius:9px; background:transparent; padding:7px 11px; color:#8b8b8b; cursor:pointer; font-size:14px; font-weight:500; }
@@ -92,7 +98,7 @@
 .trendingTitle { margin:0; color:#bcbcbc; font-size:15px; font-weight:400; letter-spacing:-.01em; line-height:1.35; }
 .trendingClicks { flex:0 0 auto; color:#777; font-size:13px; font-weight:400; }
 .trendingCard:hover .trendingTitle { color:#ededed; }
-.blogArticle { width:min(760px, 100%); animation:docs-article-in 360ms cubic-bezier(.2, .75, .2, 1) both; padding:clamp(28px, 6vw, 84px); }
+.blogArticle { width:min(760px, 100%); margin:0 auto; animation:docs-article-in 360ms cubic-bezier(.2, .75, .2, 1) both; padding:clamp(28px, 6vw, 84px); }
 .blogEyebrow { margin:0 0 18px; color:#838383; font-size:13px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
 .blogArticle h1 { margin:0; color:#f1f1f1; font-size:clamp(34px, 4vw, 56px); font-weight:600; letter-spacing:-.055em; line-height:1.06; }
 .blogSummary { margin:28px 0 0; color:#c8c8c8; font-size:22px; line-height:1.5; }
@@ -109,4 +115,5 @@
 @keyframes docs-article-in { from { opacity:0; filter:blur(10px); transform:translateY(18px); } to { opacity:1; filter:blur(0); transform:translateY(0); } }
 @keyframes welcome-prompt { 0% { filter:blur(10px); opacity:0; transform:translateY(8px); } 16%, 100% { filter:blur(0); opacity:1; transform:translateY(0); } }
 @media (prefers-reduced-motion:reduce) { .welcomeHeadlineText, .blogArticle { animation:none; } }
+@media (max-width:700px) { .docsCanvas { grid-template-columns:minmax(144px, .75fr) minmax(0, 1fr); } .docsSidebar { padding:20px 8px; } .docsNavButton { padding:9px 8px; font-size:13px; } .blogArticle { padding:32px 24px 96px; } .blogSummary { font-size:19px; } .blogBody p { font-size:17px; } }
 @media (max-width:700px) { .workspace { grid-template-columns:1fr; } .rail { position:fixed; z-index:2; right:12px; bottom:12px; top:auto; height:auto; flex-direction:row; border:0; border-radius:16px; padding:7px; background:#181818; } .rail .brand { display:none; } .railButton { width:45px; min-height:42px; } .main { padding:10px; } .frame { min-height:calc(100vh - 20px); border-radius:16px; } .homeContent { padding:128px 0 96px; } .composerWrap { width:calc(100% - 32px); } .featuredStory { grid-template-columns:1fr; } .featuredVisual { min-height:220px; } .featuredCopy { padding:28px; } .researchGrid, .boardGrid { grid-auto-columns:86%; } .footerContent { grid-template-columns:repeat(2, minmax(0, 1fr)); } .footerBrand { grid-column:1 / -1; } .project { grid-template-columns:1fr; padding:12px; } .chatPanel { display:none; } .tabs { overflow:auto; justify-content:flex-start; padding:14px; } .content { padding:0 18px 90px; } }

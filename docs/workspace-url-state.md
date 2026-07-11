@@ -5,7 +5,7 @@
 | Screen | URL | Reproduces |
 | --- | --- | --- |
 | Agent home | `?screen=home&context=agent` | Agent home context |
-| Docs home | `?screen=home&context=docs` | Docs home context |
+| Docs home | `?screen=docs&blog=tscircuit-framework` | Docs with its selected article |
 | Docs article | `?screen=docs&blog=pcb-trace-widths` | Selected static Docs article |
 | Project | `?screen=project&thread=<uuid>&tab=pcb` | Opaque thread reference and active artefact tab |
 
