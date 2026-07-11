@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 
-const geistMono = Geist_Mono({
-  variable: "--font-workspace",
+const geistSans = Geist({
+  variable: "--font-interface",
   subsets: ["latin"],
 });
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 /** Provides the dark-only shell and shared typeface. */
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={geistMono.variable}>
+    <html lang="en" className={geistSans.variable}>
       <body>{children}</body>
     </html>
   );

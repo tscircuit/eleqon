@@ -39,7 +39,7 @@ export function Workspace() {
   };
 
   return (
-    <div className={styles.workspace}>
+    <div className={styles.workspace} data-view={view.kind}>
       <nav className={styles.rail} aria-label="Workspace navigation">
         <Brand className={styles.brand} />
         <RailButton label="New" icon={<PlusIcon />} onClick={startThread} active={view.kind === "welcome"} />
@@ -79,5 +79,5 @@ function Thread({ thread, activeTab }: { readonly thread: ChatThread; readonly a
 function Composer({ onSubmit }: { readonly onSubmit: (prompt: string) => void }) {
   const [draft, setDraft] = useState("");
   const send = () => { const prompt = draft.trim(); if (prompt) { onSubmit(prompt); setDraft(""); } };
-  return <div className={styles.composer}><textarea value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); send(); } }} placeholder="Describe your project..." aria-label="Project description" /><button className={styles.send} type="button" onClick={send} disabled={!draft.trim()} aria-label="Start chat"><ArrowIcon /></button></div>;
+  return <div className={styles.composer}><textarea value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); send(); } }} placeholder="Work on anything" aria-label="Project description" /><div className={styles.composerFooter}><button className={styles.attach} type="button" aria-label="Add context">+</button><button className={styles.send} type="button" onClick={send} disabled={!draft.trim()} aria-label="Start chat"><ArrowIcon /></button></div></div>;
 }

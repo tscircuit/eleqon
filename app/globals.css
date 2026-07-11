@@ -10,7 +10,7 @@ body {
   margin: 0;
   background: #101010;
   color: #ededed;
-  font-family: var(--font-workspace), ui-monospace, monospace;
+  font-family: var(--font-interface), ui-sans-serif, system-ui, sans-serif;
 }
 
 button, textarea { font: inherit; }
