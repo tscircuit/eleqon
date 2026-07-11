@@ -40,7 +40,7 @@ export function Workspace() {
 
   useEffect(() => { const store = new ChatThreadStore(window.localStorage); threads.toReversed().forEach((thread) => store.save(thread)); }, [threads]);
 
-  const startThread = () => setView({ kind: "welcome" });
+  const startThread = () => { setHomeTab("agent"); setView({ kind: "welcome" }); };
   const selectThread = (threadId: ChatThread["id"]) => setView({ kind: "thread", threadId });
   const submit = (prompt: string) => {
     startTransition(() => {
@@ -61,7 +61,7 @@ export function Workspace() {
         <RailButton label="History" icon={<HistoryIcon />} onClick={() => { const latest = threads[0]; if (latest) selectThread(latest.id); }} active={view.kind === "thread"} />
       </nav>
       <main className={styles.main}>
-        {view.kind === "welcome" ? <Welcome onSubmit={submit} /> : (
+        {view.kind === "welcome" ? homeTab === "agent" ? <Welcome onSubmit={submit} /> : <DocsPage onSubmit={submit} /> : (
           <ProjectView activeTab={activeTab} thread={threads.find((thread) => thread.id === view.threadId)} onSubmit={submit} onTab={setActiveTab} />
         )}
       </main>
@@ -117,7 +117,17 @@ function WelcomeHeadline() {
 
 /** Renders the split chat and engineering workspace. */
 function ProjectView({ activeTab, thread, onSubmit, onTab }: { readonly activeTab: WorkspaceTab; readonly thread: ChatThread | undefined; readonly onSubmit: (prompt: string) => void; readonly onTab: (tab: WorkspaceTab) => void }) {
-  return <section className={`${styles.frame} ${styles.project}`}><aside className={styles.chatPanel} aria-label="Chat area"><div className={styles.chatArea}>{thread ? <p className={styles.chatMessage}>{thread.title}</p> : null}</div><div className={styles.chatInput}><Composer onSubmit={onSubmit} /></div></aside><section className={styles.canvas}><div className={styles.tabs} role="tablist" aria-label="Build artefacts">{tabs.map(({ id, label, icon: Icon }) => <button key={id} className={styles.tab} data-active={activeTab === id} type="button" role="tab" aria-selected={activeTab === id} onClick={() => onTab(id)}><Icon />{label}</button>)}</div><div className={styles.content} /></section></section>;
+  return <section className={`${styles.frame} ${styles.project}`}><ChatColumn thread={thread} onSubmit={onSubmit} /><section className={styles.canvas}><div className={styles.tabs} role="tablist" aria-label="Build artefacts">{tabs.map(({ id, label, icon: Icon }) => <button key={id} className={styles.tab} data-active={activeTab === id} type="button" role="tab" aria-selected={activeTab === id} onClick={() => onTab(id)}><Icon />{label}</button>)}</div><div className={styles.content} /></section></section>;
+}
+
+/** Renders the documentation view without engineering artefact tabs. */
+function DocsPage({ onSubmit }: { readonly onSubmit: (prompt: string) => void }) {
+  return <section className={`${styles.frame} ${styles.project} ${styles.docsPage}`}><ChatColumn onSubmit={onSubmit} /><section className={styles.docsCanvas}><h1>Docs</h1></section></section>;
+}
+
+/** Keeps chat and input layout consistent across workspace views. */
+function ChatColumn({ thread, onSubmit }: { readonly thread?: ChatThread; readonly onSubmit: (prompt: string) => void }) {
+  return <aside className={styles.chatPanel} aria-label="Chat area"><div className={styles.chatArea}>{thread ? <p className={styles.chatMessage}>{thread.title}</p> : null}</div><div className={styles.chatInput}><Composer onSubmit={onSubmit} /></div></aside>;
 }
 
 /** Captures a non-empty build prompt. */
