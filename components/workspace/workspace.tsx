@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { createChatThread, parseChatThreadTitle, type ChatThread } from "@/lib/chat-thread";
 import { ChatThreadStore } from "@/lib/chat-thread-store";
 import { ArrowIcon, BoardIcon, CodeIcon, CubeIcon, HistoryIcon, PlusIcon, SchematicIcon } from "./icons";
@@ -12,7 +12,6 @@ type View = { readonly kind: "welcome" } | { readonly kind: "thread"; readonly t
 type HomeTab = "agent" | "docs";
 type LibraryItem = Readonly<{ readonly title: string; readonly detail: string }>;
 type LibraryItems = readonly [LibraryItem, ...LibraryItem[]];
-type VisibleCardCount = 3 | 4;
 
 const tabs: ReadonlyArray<{ readonly id: WorkspaceTab; readonly label: string; readonly icon: typeof CodeIcon }> = [
   { id: "code", label: "Code", icon: CodeIcon },
@@ -106,17 +105,15 @@ function Welcome({ onSubmit }: { readonly onSubmit: (prompt: string) => void }) 
 
 /** Renders the featured explainer and browsable tscircuit work. */
 function HomeLibrary({ showFeatureFade }: { readonly showFeatureFade: boolean }) {
-  return <div className={styles.homeLibrary}><section className={styles.featuredStory} data-faded={showFeatureFade}><div className={styles.featuredVisual} aria-hidden="true"><span>tscircuit</span></div><article className={styles.featuredCopy}><h2>What is tscircuit framework?</h2><p>tscircuit is a toolkit for designing electronics with code. Define components, connections, board constraints, and manufacturing details in one workflow. It helps teams move from an idea to a reviewable PCB without losing the reasoning behind each design choice.</p></article></section><LibrarySection title="Research" items={researchItems} visibleCount={4} className={styles.researchGrid} /><LibrarySection title="Ordered boards" items={orderedBoards} visibleCount={3} className={styles.boardGrid} /></div>;
+  return <div className={styles.homeLibrary}><section className={styles.featuredStory} data-faded={showFeatureFade}><div className={styles.featuredVisual} aria-hidden="true"><span>tscircuit</span></div><article className={styles.featuredCopy}><h2>What is tscircuit framework?</h2><p>tscircuit is a toolkit for designing electronics with code. Define components, connections, board constraints, and manufacturing details in one workflow. It helps teams move from an idea to a reviewable PCB without losing the reasoning behind each design choice.</p></article></section><LibrarySection title="Research" items={researchItems} className={styles.researchGrid} /><LibrarySection title="Ordered boards" items={orderedBoards} className={styles.boardGrid} /></div>;
 }
 
-/** Renders a named group of compact library cards. */
-function LibrarySection({ title, items, visibleCount, className }: { readonly title: string; readonly items: LibraryItems; readonly visibleCount: VisibleCardCount; readonly className: string }) {
-  const [startIndex, setStartIndex] = useState(0);
-  const shownItems = Array.from({ length: visibleCount }, (_, offset) => items[(startIndex + offset) % items.length]);
-  const showPrevious = () => setStartIndex((current) => (current + items.length - 1) % items.length);
-  const showNext = () => setStartIndex((current) => (current + 1) % items.length);
+/** Renders a named group of smoothly scrollable library cards. */
+function LibrarySection({ title, items, className }: { readonly title: string; readonly items: LibraryItems; readonly className: string }) {
+  const listRef = useRef<HTMLDivElement>(null);
+  const scrollCards = (direction: -1 | 1) => listRef.current?.scrollBy({ left: direction * listRef.current.clientWidth, behavior: "smooth" });
 
-  return <section className={styles.librarySection}><div className={styles.libraryHeader}><h2>{title}</h2><div className={styles.libraryControls}><button className={styles.libraryControl} type="button" onClick={showPrevious} aria-label={`Previous ${title}`}>←</button><button className={styles.libraryControl} type="button" onClick={showNext} aria-label={`Next ${title}`}>→</button></div></div><div className={className}>{shownItems.map((item) => <article key={item.title} className={styles.libraryCard}><div className={styles.cardVisual} aria-hidden="true" /><h3>{item.title}</h3><p>{item.detail}</p></article>)}</div></section>;
+  return <section className={styles.librarySection}><div className={styles.libraryHeader}><h2>{title}</h2><div className={styles.libraryControls}><button className={styles.libraryControl} type="button" onClick={() => scrollCards(-1)} aria-label={`Previous ${title}`}>←</button><button className={styles.libraryControl} type="button" onClick={() => scrollCards(1)} aria-label={`Next ${title}`}>→</button></div></div><div ref={listRef} className={className}>{items.map((item) => <article key={item.title} className={styles.libraryCard}><div className={styles.cardVisual} aria-hidden="true" /><h3>{item.title}</h3><p>{item.detail}</p></article>)}</div></section>;
 }
 
 /** Restores the lightweight PCB reading list on the home page. */
