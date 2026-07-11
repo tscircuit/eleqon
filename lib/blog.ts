@@ -6,6 +6,7 @@ export type BlogPost = Readonly<{
   readonly id: BlogId;
   readonly title: string;
   readonly summary: string;
+  readonly visits: string;
   readonly body: readonly [string, ...string[]];
 }>;
 
@@ -14,6 +15,7 @@ const blogPosts: Readonly<Record<BlogId, BlogPost>> = {
     id: "tscircuit-framework",
     title: "What is tscircuit framework?",
     summary: "A toolkit for designing electronics with code, from components through to a reviewable PCB.",
+    visits: "96K",
     body: [
       "tscircuit is a toolkit for defining electronic designs as code. Components, connections, board constraints, and manufacturing details live in one readable workflow.",
       "That makes design intent easier to review. A teammate can see why a component was selected, how a connection is constrained, and what the board needs before it reaches fabrication.",
@@ -24,6 +26,7 @@ const blogPosts: Readonly<Record<BlogId, BlogPost>> = {
     id: "pcb-trace-widths",
     title: "PCB trace widths: a practical guide",
     summary: "Choose widths from current, copper weight, temperature rise, and manufacturability—not guesswork.",
+    visits: "42K",
     body: [
       "Trace width is a constraint, not decoration. Begin with the current a net carries, your copper weight, and an acceptable temperature rise.",
       "Set power and ground widths deliberately, then make high-speed geometry explicit as part of the board rules. Keep the values close to the design instead of collecting them in an untracked checklist.",
@@ -34,6 +37,7 @@ const blogPosts: Readonly<Record<BlogId, BlogPost>> = {
     id: "differential-pairs",
     title: "Routing differential pairs without guesswork",
     summary: "Keep impedance, spacing, references, and length matching visible in the design rules.",
+    visits: "31K",
     body: [
       "Differential pairs work as a system: the two traces, their spacing, the reference plane, and every discontinuity all affect the result.",
       "Declare pair width, gap, target impedance, and length tolerance before routing. Those rules turn a fragile manual process into something the whole team can inspect.",
@@ -44,6 +48,7 @@ const blogPosts: Readonly<Record<BlogId, BlogPost>> = {
     id: "ground-pours",
     title: "Ground pours that make your board quieter",
     summary: "A continuous, intentional return path is usually more valuable than adding copper everywhere.",
+    visits: "20K",
     body: [
       "A ground pour is useful when it gives signals a short, predictable return path. It is less useful when it becomes a collection of isolated copper islands.",
       "Start by protecting continuous reference planes under fast signals, then add stitching vias where layer changes would otherwise lengthen the return path.",
