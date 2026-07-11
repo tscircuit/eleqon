@@ -8,9 +8,9 @@ This is a dark-only local-first engineering workspace. The initial prompt starts
 
 `app/page.tsx` is a server component and renders the client boundary at `components/workspace/workspace.tsx`. The current screen, home context, opaque project thread ID, and active artefact tab are URL-backed; its small composed children render the rail, thread panel, composer, and canvas.
 
-`lib/workspace-url-state.ts` owns the typed parse/serialize boundary for reproducible URLs. `lib/blog.ts` owns blog IDs, types, and parsing; `lang/en/blogs.ts` owns the English article catalog. `lib/chat-thread-store.ts` remains the local history cache, storing versioned threads under `tscircuit.chat-threads.v1` in browser localStorage. `components/workspace/history-drawer.tsx` renders that cache as the rail’s expandable History drawer; selecting a thread routes to its opaque URL state.
+`lib/workspace-url-state.ts` owns the typed parse/serialize boundary for reproducible URLs. `lib/blog.ts` owns blog IDs, types, and parsing; `lang/en/blogs.ts` owns the English article catalog. `lib/chat-thread-store.ts` remains the local history cache, storing versioned threads under `tscircuit.chat-threads.v1` in browser localStorage. `components/workspace/history-drawer.tsx` renders that cache as the rail’s expandable History drawer; selecting a thread routes to its opaque URL state. The client boundary loads browser-only threads and URL state in an effect after hydration so the server and first client render always match.
 
-`lang/en/workspace.ts` owns all rendered English workspace copy, including metadata, navigation, labels, library content, and footer text. Do not add user-visible English strings to components or runtime modules.
+`lang/en/workspace.ts` owns shared rendered English workspace copy. `lang/en/packages.ts` owns the Packages page’s copy and static catalog. Do not add user-visible English strings to components or runtime modules.
 
 ## Extension points
 

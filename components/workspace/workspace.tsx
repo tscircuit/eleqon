@@ -8,6 +8,7 @@ import { createChatThread, parseChatThreadTitle, type ChatThread } from "@/lib/c
 import { ChatThreadStore } from "@/lib/chat-thread-store";
 import { parseWorkspaceUrlState, serializeWorkspaceUrlState, type DocsUrlState, type HomeTab, type WorkspaceTab, type WorkspaceUrlState } from "@/lib/workspace-url-state";
 import { HistoryDrawer } from "./history-drawer";
+import { PackagesPage } from "./packages-page";
 import { ArrowIcon, BoardIcon, CodeIcon, CubeIcon, HistoryIcon, PlusIcon, SchematicIcon } from "./icons";
 import { Brand } from "./brand";
 import styles from "./workspace.module.css";
@@ -24,17 +25,42 @@ const tabs: ReadonlyArray<{ readonly id: WorkspaceTab; readonly label: string; r
 
 /** Manages local threads and composes the workspace views. */
 export function Workspace() {
-  const [threads, setThreads] = useState<ReadonlyArray<ChatThread>>(() => typeof window === "undefined" ? [] : new ChatThreadStore(window.localStorage).read());
-  const [workspaceState, setWorkspaceState] = useState<WorkspaceUrlState>(() => typeof window === "undefined" ? { kind: "home", homeTab: "agent" } : parseWorkspaceUrlState(window.location.search));
+  const [threads, setThreads] = useState<ReadonlyArray<ChatThread>>([]);
+  const [workspaceState, setWorkspaceState] = useState<WorkspaceUrlState>({ kind: "home", homeTab: "agent" });
   const [historyOpen, setHistoryOpen] = useState(false);
   const [, startTransition] = useTransition();
 
-  useEffect(() => { const restoreWorkspaceState = () => setWorkspaceState(parseWorkspaceUrlState(window.location.search)); window.addEventListener("popstate", restoreWorkspaceState); return () => window.removeEventListener("popstate", restoreWorkspaceState); }, []);
+  useEffect(() => {
+    const restoreWorkspaceState = () => setWorkspaceState(parseWorkspaceUrlState(window.location.search));
+    const hydrationFrame = window.requestAnimationFrame(() => {
+      setThreads(new ChatThreadStore(window.localStorage).read());
+      restoreWorkspaceState();
+    });
+
+    window.addEventListener("popstate", restoreWorkspaceState);
+    return () => {
+      window.cancelAnimationFrame(hydrationFrame);
+      window.removeEventListener("popstate", restoreWorkspaceState);
+    };
+  }, []);
 
   const navigate = (state: WorkspaceUrlState) => { window.history.pushState(null, "", `${window.location.pathname}${serializeWorkspaceUrlState(state)}`); setWorkspaceState(state); };
   const startThread = () => { setHistoryOpen(false); navigate({ kind: "home", homeTab: "agent" }); };
   const openBlog = (blogId: BlogId) => navigate({ kind: "home", homeTab: "docs", docs: { kind: "article", blogId } });
   const openBlogs = () => navigate({ kind: "home", homeTab: "docs", docs: { kind: "blogs" } });
+  const openHomeTab = (homeTab: HomeTab) => {
+    if (homeTab === "agent") {
+      navigate({ kind: "home", homeTab });
+      return;
+    }
+
+    if (homeTab === "docs") {
+      navigate({ kind: "home", homeTab, docs: { kind: "article", blogId: "tscircuit-framework" } });
+      return;
+    }
+
+    navigate({ kind: "home", homeTab });
+  };
   const selectThread = (thread: ChatThread) => { setHistoryOpen(false); navigate({ kind: "project", threadId: thread.id, activeTab: "code" }); };
   const submit = (prompt: string) => {
     startTransition(() => {
@@ -50,7 +76,7 @@ export function Workspace() {
 
   return (
     <div className={styles.workspace} data-view={workspaceState.kind} data-history-open={historyOpen}>
-      {workspaceState.kind === "home" ? <HomeNotch activeTab={workspaceState.homeTab} onSelect={(homeTab) => navigate(homeTab === "agent" ? { kind: "home", homeTab } : { kind: "home", homeTab, docs: { kind: "article", blogId: "tscircuit-framework" } })} /> : null}
+      {workspaceState.kind === "home" ? <HomeNotch activeTab={workspaceState.homeTab} onSelect={openHomeTab} /> : null}
       <aside className={styles.rail}>
         <nav className={styles.railControls} aria-label={enWorkspace.aria.workspaceNavigation}>
           <Brand className={styles.brand} />
@@ -60,7 +86,7 @@ export function Workspace() {
         <HistoryDrawer open={historyOpen} threads={threads} activeThreadId={workspaceState.kind === "project" ? workspaceState.threadId : null} onSelect={selectThread} />
       </aside>
       <main className={styles.main}>
-        {workspaceState.kind === "home" ? workspaceState.homeTab === "agent" ? <Welcome onSubmit={submit} onOpenBlog={openBlog} /> : <DocsPage onSubmit={submit} docs={workspaceState.docs} onOpenBlog={openBlog} onOpenBlogs={openBlogs} /> : (
+        {workspaceState.kind === "home" ? workspaceState.homeTab === "agent" ? <Welcome onSubmit={submit} onOpenBlog={openBlog} /> : workspaceState.homeTab === "docs" ? <DocsPage onSubmit={submit} docs={workspaceState.docs} onOpenBlog={openBlog} onOpenBlogs={openBlogs} /> : <PackagesPage onReadMore={() => openBlog("tscircuit-packages")} /> : (
           <ProjectView activeTab={workspaceState.activeTab} thread={selectedThread} onSubmit={submit} onTab={(activeTab) => navigate({ ...workspaceState, activeTab })} />
         )}
       </main>
@@ -70,7 +96,7 @@ export function Workspace() {
 
 /** Switches the home-screen context between agent and documentation. */
 function HomeNotch({ activeTab, onSelect }: { readonly activeTab: HomeTab; readonly onSelect: (tab: HomeTab) => void }) {
-  return <div className={styles.notch} role="tablist" aria-label={enWorkspace.aria.homeContext}><button className={styles.notchButton} data-active={activeTab === "agent"} type="button" role="tab" aria-selected={activeTab === "agent"} onClick={() => onSelect("agent")}>{enWorkspace.homeTabs.agent}</button><button className={styles.notchButton} data-active={activeTab === "docs"} type="button" role="tab" aria-selected={activeTab === "docs"} onClick={() => onSelect("docs")}>{enWorkspace.homeTabs.docs}</button></div>;
+  return <div className={styles.notch} role="tablist" aria-label={enWorkspace.aria.homeContext}><button className={styles.notchButton} data-active={activeTab === "agent"} type="button" role="tab" aria-selected={activeTab === "agent"} onClick={() => onSelect("agent")}>{enWorkspace.homeTabs.agent}</button><button className={styles.notchButton} data-active={activeTab === "docs"} type="button" role="tab" aria-selected={activeTab === "docs"} onClick={() => onSelect("docs")}>{enWorkspace.homeTabs.docs}</button><button className={styles.notchButton} data-active={activeTab === "packages"} type="button" role="tab" aria-selected={activeTab === "packages"} onClick={() => onSelect("packages")}>{enWorkspace.homeTabs.packages}</button></div>;
 }
 
 /** Renders a rail navigation control. */

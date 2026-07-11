@@ -18,6 +18,7 @@ export const enWorkspace = {
   homeTabs: {
     agent: "Agent",
     docs: "Docs",
+    packages: "Packages",
   },
   tabs: {
     code: "Code",

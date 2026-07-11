@@ -5,7 +5,7 @@ import { parseBlogId, type BlogId } from "./blog";
 export type WorkspaceTab = "code" | "pcb" | "schematic" | "model";
 
 /** A home context that can be reproduced in a home URL. */
-export type HomeTab = "agent" | "docs";
+export type HomeTab = "agent" | "docs" | "packages";
 
 /** The reproducible content shown while the Docs home context is active. */
 export type DocsUrlState =
@@ -16,6 +16,7 @@ export type DocsUrlState =
 export type WorkspaceUrlState =
   | Readonly<{ readonly kind: "home"; readonly homeTab: "agent" }>
   | Readonly<{ readonly kind: "home"; readonly homeTab: "docs"; readonly docs: DocsUrlState }>
+  | Readonly<{ readonly kind: "home"; readonly homeTab: "packages" }>
   | Readonly<{ readonly kind: "project"; readonly threadId: ChatThreadId; readonly activeTab: WorkspaceTab }>;
 
 /** Parse browser query parameters into a valid reproducible workspace state. */
@@ -39,6 +40,10 @@ export function parseWorkspaceUrlState(search: string): WorkspaceUrlState {
     return { kind: "home", homeTab: "docs", docs: { kind: "article", blogId: blogId ?? "tscircuit-framework" } };
   }
 
+  if (params.get("screen") === "packages" || params.get("context") === "packages") {
+    return { kind: "home", homeTab: "packages" };
+  }
+
   return { kind: "home", homeTab: "agent" };
 }
 
@@ -57,6 +62,8 @@ export function serializeWorkspaceUrlState(state: WorkspaceUrlState): string {
     } else {
       params.set("article", state.docs.blogId);
     }
+  } else if (state.homeTab === "packages") {
+    params.set("screen", "packages");
   } else {
     params.set("screen", "home");
     params.set("context", "agent");

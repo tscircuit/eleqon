@@ -125,6 +125,33 @@
 .blogsIndexRow:first-child { border-top:1px solid #2b2b2b; }
 .blogsIndexRow:hover { color:#f5f5f5; }
 .blogsIndexRow small { flex:0 0 auto; color:#777; font-size:13px; font-weight:400; letter-spacing:0; }
+.packagesPage { display:block; height:calc(100vh - 40px); overflow-y:auto; }
+.packagesContent { width:min(1120px, calc(100% - 96px)); margin:0 auto; padding:clamp(120px, 18vh, 210px) 0 112px; }
+.packageFeature { display:grid; grid-template-columns:minmax(0, 1fr) minmax(320px, .9fr); min-height:310px; overflow:hidden; border-radius:24px; background:#1a1a1a; }
+.packageFeatureVisual { position:relative; display:grid; place-items:center; overflow:hidden; background:radial-gradient(circle at 50% 40%, #343434 0, #222 42%, #151515 76%); color:#f1f1f1; font-size:34px; font-weight:600; letter-spacing:-.055em; }
+.packageFeatureVisual::before, .packageFeatureVisual::after { position:absolute; content:""; border:1px solid rgba(255,255,255,.12); border-radius:50%; }
+.packageFeatureVisual::before { width:62%; aspect-ratio:1; }
+.packageFeatureVisual::after { width:38%; aspect-ratio:1; }
+.packageFeatureVisual span { position:relative; z-index:1; }
+.packageFeatureCopy { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:48px; background:#1b1b1b; }
+.packageFeatureCopy h1 { margin:0; color:#f2f2f2; font-size:clamp(34px, 4vw, 52px); font-weight:600; letter-spacing:-.055em; line-height:1.08; }
+.packageFeatureCopy p { margin:22px 0 0; color:#aaa; font-size:18px; line-height:1.55; }
+.packageFeatureCopy button { margin-top:30px; border:1px solid #3f3f3f; border-radius:10px; background:#272727; padding:10px 14px; color:#efefef; cursor:pointer; font:inherit; font-size:15px; font-weight:600; }
+.packageFeatureCopy button:hover { background:#303030; border-color:#606060; }
+.packageSearch { display:grid; gap:8px; margin:38px auto 0; color:#9d9d9d; font-size:14px; font-weight:500; }
+.packageSearch input { width:100%; border:1px solid #353535; border-radius:14px; outline:0; background:#191919; padding:17px 20px; color:#efefef; font:inherit; font-size:18px; }
+.packageSearch input::placeholder { color:#787878; }
+.packageSearch input:focus { border-color:#696969; }
+.packageCollection { margin-top:44px; }
+.packageCollection h2 { margin:0 0 18px; color:#f0f0f0; font-size:26px; font-weight:600; letter-spacing:-.035em; }
+.packageGrid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:18px; }
+.packageCard { min-width:0; overflow:hidden; border-radius:18px; background:#1b1b1b; }
+.packagePreview { display:grid; height:132px; place-items:center; background:linear-gradient(135deg, #333, #202020 55%, #161616); color:#bdbdbd; font-size:16px; font-weight:600; letter-spacing:.08em; }
+.packageCard > div:last-child { padding:20px; }
+.packageCard h3 { overflow:hidden; margin:0; color:#f0f0f0; font-size:20px; font-weight:600; letter-spacing:-.035em; text-overflow:ellipsis; white-space:nowrap; }
+.packageCard p { margin:10px 0 0; color:#b1b1b1; font-size:15px; line-height:1.4; }
+.packageCard small { display:block; margin-top:8px; color:#747474; font-size:13px; line-height:1.4; }
+.packageEmpty { margin:0; color:#858585; font-size:16px; }
 .footer { margin-top:8px; border-top:1px solid #292929; padding:54px 0 28px; }
 .footerContent { display:grid; grid-template-columns:minmax(240px, 2fr) repeat(4, minmax(120px, 1fr)); gap:32px; }
 .footerBrand strong { display:inline-block; color:#f0f0f0; font-size:24px; font-weight:650; letter-spacing:-.055em; }
@@ -136,5 +163,5 @@
 @keyframes docs-article-in { from { opacity:0; filter:blur(10px); transform:translateY(18px); } to { opacity:1; filter:blur(0); transform:translateY(0); } }
 @keyframes welcome-prompt { 0% { filter:blur(10px); opacity:0; transform:translateY(8px); } 16%, 100% { filter:blur(0); opacity:1; transform:translateY(0); } }
 @media (prefers-reduced-motion:reduce) { .welcomeHeadlineText, .blogArticle, .blogsIndex { animation:none; } }
-@media (max-width:700px) { .docsCanvas { grid-template-columns:minmax(144px, .75fr) minmax(0, 1fr); } .docsSidebar { padding:20px 8px; } .docsNavButton { padding:9px 8px; font-size:13px; } .blogArticle, .blogsIndex { padding:32px 24px 96px; } .blogSummary { font-size:19px; } .blogBody p { font-size:17px; } }
+@media (max-width:700px) { .docsCanvas { grid-template-columns:minmax(144px, .75fr) minmax(0, 1fr); } .docsSidebar { padding:20px 8px; } .docsNavButton { padding:9px 8px; font-size:13px; } .blogArticle, .blogsIndex { padding:32px 24px 96px; } .blogSummary { font-size:19px; } .blogBody p { font-size:17px; } .packagesContent { width:calc(100% - 32px); padding-top:110px; } .packageFeature { grid-template-columns:1fr; } .packageFeatureVisual { min-height:210px; } .packageFeatureCopy { padding:30px; } .packageGrid { grid-template-columns:1fr; } }
 @media (max-width:700px) { .workspace, .workspace[data-history-open="true"] { grid-template-columns:1fr; } .rail { position:fixed; z-index:2; right:12px; bottom:12px; top:auto; height:auto; grid-template-columns:auto; overflow:visible; border:0; border-radius:16px; background:#181818; } .railControls { flex-direction:row; padding:7px; } .rail .brand { display:none; } .railButton { width:45px; min-height:42px; } .historyDrawer { position:absolute; right:0; bottom:calc(100% + 10px); width:min(320px, calc(100vw - 24px)); max-height:52vh; overflow-y:auto; border:1px solid #292929; border-radius:16px; background:#181818; box-shadow:0 16px 40px rgba(0,0,0,.35); } .main { padding:10px; } .frame { min-height:calc(100vh - 20px); border-radius:16px; } .homeContent { padding:128px 0 96px; } .composerWrap { width:calc(100% - 32px); } .featuredStory { grid-template-columns:1fr; } .featuredVisual { min-height:220px; } .featuredCopy { padding:28px; } .researchGrid, .boardGrid { grid-auto-columns:86%; } .footerContent { grid-template-columns:repeat(2, minmax(0, 1fr)); } .footerBrand { grid-column:1 / -1; } .project { grid-template-columns:1fr; padding:12px; } .chatPanel { display:none; } .tabs { overflow:auto; justify-content:flex-start; padding:14px; } .content { padding:0 18px 90px; } }

@@ -12,6 +12,17 @@ const blogPosts: Readonly<Record<BlogId, BlogPost>> = {
       "Start with a circuit description, inspect the result in the workspace, then iterate with the same source of truth behind every artefact.",
     ],
   },
+  "tscircuit-packages": {
+    id: "tscircuit-packages",
+    title: "tscircuit Packages",
+    summary: "Publish board designs, components, and reusable building blocks with a link anyone can open.",
+    visits: "18K",
+    body: [
+      "A tscircuit package is a small, reusable electronics project. It can contain a board, a component, or a focused design pattern that someone else can open and build from.",
+      "Packages replace the separate npm package and GitHub repository workflow. Publish from tscircuit, get one shareable link, and keep the design, preview, and version together in one place.",
+      "A package can begin as something personal—a Pico board, a Raspberry Pi accessory, or a useful chip breakout—then be shared in seconds as a reliable starting point for the next build.",
+    ],
+  },
   "pcb-trace-widths": {
     id: "pcb-trace-widths",
     title: "PCB trace widths: a practical guide",
@@ -49,6 +60,7 @@ const blogPosts: Readonly<Record<BlogId, BlogPost>> = {
 
 const blogOrder: readonly BlogId[] = [
   "tscircuit-framework",
+  "tscircuit-packages",
   "pcb-trace-widths",
   "differential-pairs",
   "ground-pours",
