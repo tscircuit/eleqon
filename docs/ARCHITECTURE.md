@@ -8,7 +8,9 @@ This is a dark-only local-first engineering workspace. The initial prompt starts
 
 `app/page.tsx` is a server component and renders the client boundary at `components/workspace/workspace.tsx`. The current screen, home context, opaque project thread ID, and active artefact tab are URL-backed; its small composed children render the rail, thread panel, composer, and canvas.
 
-`lib/workspace-url-state.ts` owns the typed parse/serialize boundary for reproducible URLs. `lib/blog.ts` owns the static article catalog used by Docs. `lib/chat-thread-store.ts` remains the local history cache, storing versioned threads under `eleqon.chat-threads.v1` in browser localStorage.
+`lib/workspace-url-state.ts` owns the typed parse/serialize boundary for reproducible URLs. `lib/blog.ts` owns blog IDs, types, and parsing; `lang/en/blogs.ts` owns the English article catalog. `lib/chat-thread-store.ts` remains the local history cache, storing versioned threads under `eleqon.chat-threads.v1` in browser localStorage.
+
+`lang/en/workspace.ts` owns all rendered English workspace copy, including metadata, navigation, labels, library content, and footer text. Do not add user-visible English strings to components or runtime modules.
 
 ## Extension points
 

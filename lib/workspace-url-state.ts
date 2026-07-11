@@ -35,7 +35,7 @@ export function parseWorkspaceUrlState(search: string): WorkspaceUrlState {
       return { kind: "home", homeTab: "docs", docs: { kind: "blogs" } };
     }
 
-    const blogId = parseBlogId(params.get("blog"));
+    const blogId = parseBlogId(params.get("article"));
     return { kind: "home", homeTab: "docs", docs: { kind: "article", blogId: blogId ?? "tscircuit-framework" } };
   }
 
@@ -55,7 +55,7 @@ export function serializeWorkspaceUrlState(state: WorkspaceUrlState): string {
     if (state.docs.kind === "blogs") {
       params.set("view", "blogs");
     } else {
-      params.set("blog", state.docs.blogId);
+      params.set("article", state.docs.blogId);
     }
   } else {
     params.set("screen", "home");
