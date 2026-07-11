@@ -12,6 +12,8 @@ This is a dark-only local-first engineering workspace. The initial prompt starts
 
 `lang/en/workspace.ts` owns shared rendered English workspace copy. `lang/en/packages.ts` owns the Packages page’s copy and static catalog. Do not add user-visible English strings to components or runtime modules.
 
+`app/globals.css` owns the dark-only design tokens. See `docs/design-tokens.md` before changing colors, typography, radii, or motion.
+
 ## Extension points
 
 - Add real generation through the `makeThread` workflow, preserving the `ChatThread` discriminated message model.
