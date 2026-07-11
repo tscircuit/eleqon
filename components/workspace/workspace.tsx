@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { getBlogPost, type BlogId, type BlogPost } from "@/lib/blog";
 import { createChatThread, parseChatThreadTitle, type ChatThread } from "@/lib/chat-thread";
 import { ChatThreadStore } from "@/lib/chat-thread-store";
 import { parseWorkspaceUrlState, serializeWorkspaceUrlState, type HomeTab, type WorkspaceTab, type WorkspaceUrlState } from "@/lib/workspace-url-state";
@@ -41,10 +42,10 @@ const orderedBoards = [
 ] as const;
 
 const trendingPcbBlogs = [
-  { title: "PCB trace widths: a practical guide", clicks: "42K clicks" },
-  { title: "Routing differential pairs without guesswork", clicks: "31K clicks" },
-  { title: "Ground pours that make your board quieter", clicks: "20K clicks" },
-] as const;
+  { id: "pcb-trace-widths", clicks: "42K clicks" },
+  { id: "differential-pairs", clicks: "31K clicks" },
+  { id: "ground-pours", clicks: "20K clicks" },
+] as const satisfies ReadonlyArray<Readonly<{ readonly id: BlogId; readonly clicks: string }>>;
 
 const footerColumns = [
   { title: "Product", links: ["Agent", "Docs", "PCB workspace", "Library"] },
@@ -63,6 +64,7 @@ export function Workspace() {
 
   const navigate = (state: WorkspaceUrlState) => { window.history.pushState(null, "", `${window.location.pathname}${serializeWorkspaceUrlState(state)}`); setWorkspaceState(state); };
   const startThread = () => navigate({ kind: "home", homeTab: "agent" });
+  const openBlog = (blogId: BlogId) => navigate({ kind: "home", homeTab: "docs", docs: { kind: "article", blogId } });
   const selectThread = (thread: ChatThread) => navigate({ kind: "project", threadId: thread.id, activeTab: "code" });
   const submit = (prompt: string) => {
     startTransition(() => {
@@ -78,14 +80,14 @@ export function Workspace() {
 
   return (
     <div className={styles.workspace} data-view={workspaceState.kind}>
-      {workspaceState.kind === "home" ? <HomeNotch activeTab={workspaceState.homeTab} onSelect={(homeTab) => navigate({ kind: "home", homeTab })} /> : null}
+      {workspaceState.kind === "home" ? <HomeNotch activeTab={workspaceState.homeTab} onSelect={(homeTab) => navigate(homeTab === "agent" ? { kind: "home", homeTab } : { kind: "home", homeTab, docs: { kind: "index" } })} /> : null}
       <nav className={styles.rail} aria-label="Workspace navigation">
         <Brand className={styles.brand} />
         <RailButton label="New" icon={<PlusIcon />} onClick={startThread} active={workspaceState.kind === "home"} />
         <RailButton label="History" icon={<HistoryIcon />} onClick={() => { const latest = threads[0]; if (latest) selectThread(latest); }} active={workspaceState.kind === "project"} />
       </nav>
       <main className={styles.main}>
-        {workspaceState.kind === "home" ? workspaceState.homeTab === "agent" ? <Welcome onSubmit={submit} /> : <DocsPage onSubmit={submit} /> : (
+        {workspaceState.kind === "home" ? workspaceState.homeTab === "agent" ? <Welcome onSubmit={submit} onOpenBlog={openBlog} /> : <DocsPage onSubmit={submit} blog={workspaceState.docs.kind === "article" ? getBlogPost(workspaceState.docs.blogId) : undefined} /> : (
           <ProjectView activeTab={workspaceState.activeTab} thread={selectedThread} onSubmit={submit} onTab={(activeTab) => navigate({ ...workspaceState, activeTab })} />
         )}
       </main>
@@ -104,14 +106,14 @@ function RailButton({ label, icon, onClick, active }: { readonly label: string; 
 }
 
 /** Renders the first-chat prompt. */
-function Welcome({ onSubmit }: { readonly onSubmit: (prompt: string) => void }) {
+function Welcome({ onSubmit, onOpenBlog }: { readonly onSubmit: (prompt: string) => void; readonly onOpenBlog: (blogId: BlogId) => void }) {
   const [atTop, setAtTop] = useState(true);
-  return <section className={`${styles.frame} ${styles.welcome}`} onScroll={(event) => setAtTop(event.currentTarget.scrollTop < 24)}><div className={styles.homeContent}><div className={styles.composerWrap}><WelcomeHeadline /><Composer onSubmit={onSubmit} /><TrendingPcbBlogs /><HomeLibrary showFeatureFade={atTop} /></div></div></section>;
+  return <section className={`${styles.frame} ${styles.welcome}`} onScroll={(event) => setAtTop(event.currentTarget.scrollTop < 24)}><div className={styles.homeContent}><div className={styles.composerWrap}><WelcomeHeadline /><Composer onSubmit={onSubmit} /><TrendingPcbBlogs onOpenBlog={onOpenBlog} /><HomeLibrary showFeatureFade={atTop} onOpenBlog={onOpenBlog} /></div></div></section>;
 }
 
 /** Renders the featured explainer and browsable tscircuit work. */
-function HomeLibrary({ showFeatureFade }: { readonly showFeatureFade: boolean }) {
-  return <div className={styles.homeLibrary}><section className={styles.featuredStory} data-faded={showFeatureFade}><div className={styles.featuredVisual} aria-hidden="true"><span>tscircuit</span></div><article className={styles.featuredCopy}><h2>What is tscircuit framework?</h2><p>tscircuit is a toolkit for designing electronics with code. Define components, connections, board constraints, and manufacturing details in one workflow. It helps teams move from an idea to a reviewable PCB without losing the reasoning behind each design choice.</p></article></section><LibrarySection title="Research" items={researchItems} className={styles.researchGrid} /><LibrarySection title="Ordered boards" items={orderedBoards} className={styles.boardGrid} /><WorkspaceFooter /></div>;
+function HomeLibrary({ showFeatureFade, onOpenBlog }: { readonly showFeatureFade: boolean; readonly onOpenBlog: (blogId: BlogId) => void }) {
+  return <div className={styles.homeLibrary}><section className={styles.featuredStory} data-faded={showFeatureFade}><div className={styles.featuredVisual} aria-hidden="true"><span>tscircuit</span></div><article className={styles.featuredCopy}><h2>What is tscircuit framework?</h2><p>tscircuit is a toolkit for designing electronics with code. Define components, connections, board constraints, and manufacturing details in one workflow. It helps teams move from an idea to a reviewable PCB without losing the reasoning behind each design choice.</p><button className={styles.featuredReadMore} type="button" onClick={() => onOpenBlog("tscircuit-framework")}>Read more <span aria-hidden="true">→</span></button></article></section><LibrarySection title="Research" items={researchItems} className={styles.researchGrid} /><LibrarySection title="Ordered boards" items={orderedBoards} className={styles.boardGrid} /><WorkspaceFooter /></div>;
 }
 
 /** Renders a named group of smoothly scrollable library cards. */
@@ -123,8 +125,8 @@ function LibrarySection({ title, items, className }: { readonly title: string; r
 }
 
 /** Restores the lightweight PCB reading list on the home page. */
-function TrendingPcbBlogs() {
-  return <section className={styles.trendingBlogs} aria-labelledby="trending-pcb-blogs"><h2 id="trending-pcb-blogs" className={styles.trendingHeading}>Trending PCB blogs</h2><div className={styles.trendingGrid}>{trendingPcbBlogs.map((blog) => <article key={blog.title} className={styles.trendingCard}><p className={styles.trendingTitle}>{blog.title}</p><span className={styles.trendingClicks}>{blog.clicks}</span></article>)}</div></section>;
+function TrendingPcbBlogs({ onOpenBlog }: { readonly onOpenBlog: (blogId: BlogId) => void }) {
+  return <section className={styles.trendingBlogs} aria-labelledby="trending-pcb-blogs"><h2 id="trending-pcb-blogs" className={styles.trendingHeading}>Trending PCB blogs</h2><div className={styles.trendingGrid}>{trendingPcbBlogs.map((blog) => { const post = getBlogPost(blog.id); return <button key={post.id} className={styles.trendingCard} type="button" onClick={() => onOpenBlog(post.id)}><span className={styles.trendingTitle}>{post.title}</span><span className={styles.trendingClicks}>{blog.clicks}</span></button>; })}</div></section>;
 }
 
 /** Renders the home library footer and supporting links. */
@@ -163,9 +165,14 @@ function ProjectView({ activeTab, thread, onSubmit, onTab }: { readonly activeTa
   return <section className={`${styles.frame} ${styles.project}`}><ChatColumn thread={thread} onSubmit={onSubmit} /><section className={styles.canvas}><div className={styles.tabs} role="tablist" aria-label="Build artefacts">{tabs.map(({ id, label, icon: Icon }) => <button key={id} className={styles.tab} data-active={activeTab === id} type="button" role="tab" aria-selected={activeTab === id} onClick={() => onTab(id)}><Icon />{label}</button>)}</div><div className={styles.content} /></section></section>;
 }
 
-/** Renders the documentation view without engineering artefact tabs. */
-function DocsPage({ onSubmit }: { readonly onSubmit: (prompt: string) => void }) {
-  return <section className={`${styles.frame} ${styles.project} ${styles.docsPage}`}><ChatColumn onSubmit={onSubmit} /><section className={styles.docsCanvas}><h1>Docs</h1></section></section>;
+/** Renders documentation and an optional selected article. */
+function DocsPage({ onSubmit, blog }: { readonly onSubmit: (prompt: string) => void; readonly blog?: BlogPost }) {
+  return <section className={`${styles.frame} ${styles.project} ${styles.docsPage}`}><ChatColumn onSubmit={onSubmit} /><section className={styles.docsCanvas}>{blog ? <BlogArticle key={blog.id} blog={blog} /> : <h1>Docs</h1>}</section></section>;
+}
+
+/** Renders a selected article in the docs workspace. */
+function BlogArticle({ blog }: { readonly blog: BlogPost }) {
+  return <article className={styles.blogArticle}><p className={styles.blogEyebrow}>tscircuit docs</p><h1>{blog.title}</h1><p className={styles.blogSummary}>{blog.summary}</p><div className={styles.blogBody}>{blog.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div></article>;
 }
 
 /** Keeps chat and input layout consistent across workspace views. */

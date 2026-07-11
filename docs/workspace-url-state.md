@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | Agent home | `?screen=home&context=agent` | Agent home context |
 | Docs home | `?screen=home&context=docs` | Docs home context |
+| Docs article | `?screen=docs&blog=pcb-trace-widths` | Selected static Docs article |
 | Project | `?screen=project&thread=<uuid>&tab=pcb` | Opaque thread reference and active artefact tab |
 
 The URL is updated with `history.pushState`, and browser back/forward restores it with `popstate`. Local storage resolves the opaque thread ID, so this small-scale version reopens a project safely in the same browser without leaking its prompt or attachments.
