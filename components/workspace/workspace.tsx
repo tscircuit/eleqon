@@ -9,6 +9,7 @@ import styles from "./workspace.module.css";
 
 type WorkspaceTab = "code" | "pcb" | "schematic" | "model";
 type View = { readonly kind: "welcome" } | { readonly kind: "thread"; readonly threadId: ChatThread["id"] };
+type HomeTab = "agent" | "docs";
 
 const tabs: ReadonlyArray<{ readonly id: WorkspaceTab; readonly label: string; readonly icon: typeof CodeIcon }> = [
   { id: "code", label: "Code", icon: CodeIcon },
@@ -34,6 +35,7 @@ export function Workspace() {
   const [threads, setThreads] = useState<ReadonlyArray<ChatThread>>(() => typeof window === "undefined" ? [] : new ChatThreadStore(window.localStorage).read());
   const [view, setView] = useState<View>({ kind: "welcome" });
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("code");
+  const [homeTab, setHomeTab] = useState<HomeTab>("agent");
   const [, startTransition] = useTransition();
 
   useEffect(() => { const store = new ChatThreadStore(window.localStorage); threads.toReversed().forEach((thread) => store.save(thread)); }, [threads]);
@@ -52,6 +54,7 @@ export function Workspace() {
 
   return (
     <div className={styles.workspace} data-view={view.kind}>
+      {view.kind === "welcome" ? <HomeNotch activeTab={homeTab} onSelect={setHomeTab} /> : null}
       <nav className={styles.rail} aria-label="Workspace navigation">
         <Brand className={styles.brand} />
         <RailButton label="New" icon={<PlusIcon />} onClick={startThread} active={view.kind === "welcome"} />
@@ -64,6 +67,11 @@ export function Workspace() {
       </main>
     </div>
   );
+}
+
+/** Switches the home-screen context between agent and documentation. */
+function HomeNotch({ activeTab, onSelect }: { readonly activeTab: HomeTab; readonly onSelect: (tab: HomeTab) => void }) {
+  return <div className={styles.notch} role="tablist" aria-label="Home context"><button className={styles.notchButton} data-active={activeTab === "agent"} type="button" role="tab" aria-selected={activeTab === "agent"} onClick={() => onSelect("agent")}>Agent</button><button className={styles.notchButton} data-active={activeTab === "docs"} type="button" role="tab" aria-selected={activeTab === "docs"} onClick={() => onSelect("docs")}>Docs</button></div>;
 }
 
 /** Renders a rail navigation control. */
