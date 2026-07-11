@@ -43,6 +43,12 @@ const orderedBoards = [
   { title: "Audio module", detail: "Low-noise signal path" },
 ] as const;
 
+const trendingPcbBlogs = [
+  { title: "PCB trace widths: a practical guide", clicks: "42K clicks" },
+  { title: "Routing differential pairs without guesswork", clicks: "31K clicks" },
+  { title: "Ground pours that make your board quieter", clicks: "20K clicks" },
+] as const;
+
 /** Manages local threads and composes the workspace views. */
 export function Workspace() {
   const [threads, setThreads] = useState<ReadonlyArray<ChatThread>>(() => typeof window === "undefined" ? [] : new ChatThreadStore(window.localStorage).read());
@@ -95,7 +101,7 @@ function RailButton({ label, icon, onClick, active }: { readonly label: string; 
 /** Renders the first-chat prompt. */
 function Welcome({ onSubmit }: { readonly onSubmit: (prompt: string) => void }) {
   const [atTop, setAtTop] = useState(true);
-  return <section className={`${styles.frame} ${styles.welcome}`} onScroll={(event) => setAtTop(event.currentTarget.scrollTop < 24)}><div className={styles.homeContent}><div className={styles.composerWrap}><WelcomeHeadline /><Composer onSubmit={onSubmit} /><HomeLibrary showFeatureFade={atTop} /></div></div></section>;
+  return <section className={`${styles.frame} ${styles.welcome}`} onScroll={(event) => setAtTop(event.currentTarget.scrollTop < 24)}><div className={styles.homeContent}><div className={styles.composerWrap}><WelcomeHeadline /><Composer onSubmit={onSubmit} /><TrendingPcbBlogs /><HomeLibrary showFeatureFade={atTop} /></div></div></section>;
 }
 
 /** Renders the featured explainer and browsable tscircuit work. */
@@ -111,6 +117,11 @@ function LibrarySection({ title, items, visibleCount, className }: { readonly ti
   const showNext = () => setStartIndex((current) => (current + 1) % items.length);
 
   return <section className={styles.librarySection}><div className={styles.libraryHeader}><h2>{title}</h2><div className={styles.libraryControls}><button className={styles.libraryControl} type="button" onClick={showPrevious} aria-label={`Previous ${title}`}>←</button><button className={styles.libraryControl} type="button" onClick={showNext} aria-label={`Next ${title}`}>→</button></div></div><div className={className}>{shownItems.map((item) => <article key={item.title} className={styles.libraryCard}><div className={styles.cardVisual} aria-hidden="true" /><h3>{item.title}</h3><p>{item.detail}</p></article>)}</div></section>;
+}
+
+/** Restores the lightweight PCB reading list on the home page. */
+function TrendingPcbBlogs() {
+  return <section className={styles.trendingBlogs} aria-labelledby="trending-pcb-blogs"><h2 id="trending-pcb-blogs" className={styles.trendingHeading}>Trending PCB blogs</h2><div className={styles.trendingGrid}>{trendingPcbBlogs.map((blog) => <article key={blog.title} className={styles.trendingCard}><p className={styles.trendingTitle}>{blog.title}</p><span className={styles.trendingClicks}>{blog.clicks}</span></article>)}</div></section>;
 }
 
 /** Cycles through the welcome prompts at a calm, readable pace. */
