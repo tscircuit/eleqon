@@ -68,7 +68,8 @@
 .composerFooter { display:flex; align-items:center; justify-content:space-between; min-height:68px; }
 .attach { border:0; background:transparent; color:#f1f1f1; cursor:pointer; }
 .attach { padding:0; font-family:var(--font-interface), ui-sans-serif, sans-serif; font-size:40px; font-weight:200; line-height:1; }
-.welcome .send { position:static; width:58px; height:58px; border-radius:50%; background:#454545; color:#191919; }
+.welcome .send { position:static; width:58px; height:58px; border-radius:50%; background:#f0f0f0; color:#181818; transition:background 160ms ease, color 160ms ease, transform 160ms ease; }
+.welcome .send:not(:disabled):hover { background:#fff; transform:translateY(-1px); }
 .welcome .send:disabled { background:#454545; color:#202020; }
 .welcome .send svg { width:28px; height:28px; stroke-width:2; }
 .homeLibrary { display:grid; gap:64px; margin-top:max(32px, calc(100vh - 1156px)); }
