@@ -56,7 +56,7 @@ export function Workspace() {
 
 /** Renders a rail navigation control. */
 function RailButton({ label, icon, onClick, active }: { readonly label: string; readonly icon: React.ReactNode; readonly onClick: () => void; readonly active: boolean }) {
-  return <button className={styles.railButton} data-active={active} type="button" onClick={onClick}>{icon}<span>{label}</span></button>;
+  return <button className={styles.railButton} data-active={active} type="button" onClick={onClick} aria-label={label}>{icon}</button>;
 }
 
 /** Renders the first-chat prompt. */
