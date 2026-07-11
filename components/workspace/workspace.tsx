@@ -21,7 +21,7 @@ const tabs: ReadonlyArray<{ readonly id: WorkspaceTab; readonly label: string; r
 const welcomePrompts = [
   "What are you planning to build today?",
   "Create a new PCB with tscircuit.",
-  "Add area vias in a PCB.",
+  "Are vias allowed in a PCB?",
 ] as const;
 
 const trendingPcbBlogs = [
