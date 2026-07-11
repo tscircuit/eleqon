@@ -24,6 +24,12 @@ const welcomePrompts = [
   "Create a new PCB with tscircuit.",
 ] as const;
 
+const trendingPcbBlogs = [
+  { title: "PCB trace widths: a practical guide", clicks: "42K clicks" },
+  { title: "Routing differential pairs without guesswork", clicks: "31K clicks" },
+  { title: "Ground pours that make your board quieter", clicks: "20K clicks" },
+] as const;
+
 /** Manages local threads and composes the workspace views. */
 export function Workspace() {
   const [threads, setThreads] = useState<ReadonlyArray<ChatThread>>(() => typeof window === "undefined" ? [] : new ChatThreadStore(window.localStorage).read());
@@ -75,7 +81,12 @@ function RailButton({ label, icon, onClick, active }: { readonly label: string; 
 
 /** Renders the first-chat prompt. */
 function Welcome({ onSubmit }: { readonly onSubmit: (prompt: string) => void }) {
-  return <section className={`${styles.frame} ${styles.welcome}`}><div className={styles.composerWrap}><WelcomeHeadline /><Composer onSubmit={onSubmit} /></div></section>;
+  return <section className={`${styles.frame} ${styles.welcome}`}><div className={styles.composerWrap}><WelcomeHeadline /><Composer onSubmit={onSubmit} /><TrendingPcbBlogs /></div></section>;
+}
+
+/** Renders lightweight, popular PCB reading suggestions. */
+function TrendingPcbBlogs() {
+  return <section className={styles.trendingBlogs} aria-labelledby="trending-pcb-blogs"><h2 id="trending-pcb-blogs" className={styles.trendingHeading}>Trending PCB blogs</h2><div className={styles.trendingGrid}>{trendingPcbBlogs.map((blog) => <article key={blog.title} className={styles.trendingCard}><p className={styles.trendingTitle}>{blog.title}</p><span className={styles.trendingClicks}>{blog.clicks}</span></article>)}</div></section>;
 }
 
 /** Cycles through the welcome prompts at a calm, readable pace. */
@@ -119,5 +130,5 @@ function Thread({ thread, activeTab }: { readonly thread: ChatThread; readonly a
 function Composer({ onSubmit }: { readonly onSubmit: (prompt: string) => void }) {
   const [draft, setDraft] = useState("");
   const send = () => { const prompt = draft.trim(); if (prompt) { onSubmit(prompt); setDraft(""); } };
-  return <div className={styles.composer}><textarea value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); send(); } }} placeholder="Work on anything" aria-label="Project description" /><div className={styles.composerFooter}><button className={styles.attach} type="button" aria-label="Add context">+</button><button className={styles.send} type="button" onClick={send} disabled={!draft.trim()} aria-label="Start chat"><ArrowIcon /></button></div></div>;
+  return <div className={styles.composer}><textarea value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); send(); } }} placeholder="Ask tscircuit agent" aria-label="Project description" /><div className={styles.composerFooter}><button className={styles.attach} type="button" aria-label="Add context">+</button><button className={styles.send} type="button" onClick={send} disabled={!draft.trim()} aria-label="Start chat"><ArrowIcon /></button></div></div>;
 }
