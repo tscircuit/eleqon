@@ -16,7 +16,7 @@ export function PlusIcon(props: IconProps) { return <Icon {...props}><path d="M1
 /** Opens thread history. */
 export function HistoryIcon(props: IconProps) { return <Icon {...props}><path d="M3.5 12a8.5 8.5 0 1 0 2.4-5.94" /><path d="M3.5 4.5v3.9h3.9M12 7v5l3.2 2" /></Icon>; }
 /** Sends the plan to the workspace. */
-export function ArrowIcon(props: IconProps) { return <Icon {...props}><path d="M5 12h13M13 6l6 6-6 6" /></Icon>; }
+export function ArrowIcon(props: IconProps) { return <Icon {...props}><path d="M12 19V6M6 12l6-6 6 6" /></Icon>; }
 /** Represents source code. */
 export function CodeIcon(props: IconProps) { return <Icon {...props}><path d="m8 9-3 3 3 3M16 9l3 3-3 3M14 5l-4 14" /></Icon>; }
 /** Represents a circuit board. */
