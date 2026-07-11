@@ -59,7 +59,7 @@ export function Workspace() {
       </nav>
       <main className={styles.main}>
         {view.kind === "welcome" ? <Welcome onSubmit={submit} /> : (
-          <ProjectView activeTab={activeTab} onSubmit={submit} onTab={setActiveTab} />
+          <ProjectView activeTab={activeTab} thread={threads.find((thread) => thread.id === view.threadId)} onSubmit={submit} onTab={setActiveTab} />
         )}
       </main>
     </div>
@@ -108,8 +108,8 @@ function WelcomeHeadline() {
 }
 
 /** Renders the split chat and engineering workspace. */
-function ProjectView({ activeTab, onSubmit, onTab }: { readonly activeTab: WorkspaceTab; readonly onSubmit: (prompt: string) => void; readonly onTab: (tab: WorkspaceTab) => void }) {
-  return <section className={`${styles.frame} ${styles.project}`}><aside className={styles.chatPanel} aria-label="Chat area"><div className={styles.chatArea} /><div className={styles.chatInput}><Composer onSubmit={onSubmit} /></div></aside><section className={styles.canvas}><div className={styles.tabs} role="tablist" aria-label="Build artefacts">{tabs.map(({ id, label, icon: Icon }) => <button key={id} className={styles.tab} data-active={activeTab === id} type="button" role="tab" aria-selected={activeTab === id} onClick={() => onTab(id)}><Icon />{label}</button>)}</div><div className={styles.content} /></section></section>;
+function ProjectView({ activeTab, thread, onSubmit, onTab }: { readonly activeTab: WorkspaceTab; readonly thread: ChatThread | undefined; readonly onSubmit: (prompt: string) => void; readonly onTab: (tab: WorkspaceTab) => void }) {
+  return <section className={`${styles.frame} ${styles.project}`}><aside className={styles.chatPanel} aria-label="Chat area"><div className={styles.chatArea}>{thread ? <p className={styles.chatMessage}>{thread.title}</p> : null}</div><div className={styles.chatInput}><Composer onSubmit={onSubmit} /></div></aside><section className={styles.canvas}><div className={styles.tabs} role="tablist" aria-label="Build artefacts">{tabs.map(({ id, label, icon: Icon }) => <button key={id} className={styles.tab} data-active={activeTab === id} type="button" role="tab" aria-selected={activeTab === id} onClick={() => onTab(id)}><Icon />{label}</button>)}</div><div className={styles.content} /></section></section>;
 }
 
 /** Captures a non-empty build prompt. */
