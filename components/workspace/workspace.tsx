@@ -48,6 +48,13 @@ const trendingPcbBlogs = [
   { title: "Ground pours that make your board quieter", clicks: "20K clicks" },
 ] as const;
 
+const footerColumns = [
+  { title: "Product", links: ["Agent", "Docs", "PCB workspace", "Library"] },
+  { title: "Resources", links: ["Quickstart", "Examples", "Design rules", "Blog"] },
+  { title: "Community", links: ["GitHub", "Discord", "YouTube", "X"] },
+  { title: "Company", links: ["About", "Privacy", "Contact"] },
+] as const;
+
 /** Manages local threads and composes the workspace views. */
 export function Workspace() {
   const [threads, setThreads] = useState<ReadonlyArray<ChatThread>>(() => typeof window === "undefined" ? [] : new ChatThreadStore(window.localStorage).read());
@@ -105,7 +112,7 @@ function Welcome({ onSubmit }: { readonly onSubmit: (prompt: string) => void }) 
 
 /** Renders the featured explainer and browsable tscircuit work. */
 function HomeLibrary({ showFeatureFade }: { readonly showFeatureFade: boolean }) {
-  return <div className={styles.homeLibrary}><section className={styles.featuredStory} data-faded={showFeatureFade}><div className={styles.featuredVisual} aria-hidden="true"><span>tscircuit</span></div><article className={styles.featuredCopy}><h2>What is tscircuit framework?</h2><p>tscircuit is a toolkit for designing electronics with code. Define components, connections, board constraints, and manufacturing details in one workflow. It helps teams move from an idea to a reviewable PCB without losing the reasoning behind each design choice.</p></article></section><LibrarySection title="Research" items={researchItems} className={styles.researchGrid} /><LibrarySection title="Ordered boards" items={orderedBoards} className={styles.boardGrid} /></div>;
+  return <div className={styles.homeLibrary}><section className={styles.featuredStory} data-faded={showFeatureFade}><div className={styles.featuredVisual} aria-hidden="true"><span>tscircuit</span></div><article className={styles.featuredCopy}><h2>What is tscircuit framework?</h2><p>tscircuit is a toolkit for designing electronics with code. Define components, connections, board constraints, and manufacturing details in one workflow. It helps teams move from an idea to a reviewable PCB without losing the reasoning behind each design choice.</p></article></section><LibrarySection title="Research" items={researchItems} className={styles.researchGrid} /><LibrarySection title="Ordered boards" items={orderedBoards} className={styles.boardGrid} /><WorkspaceFooter /></div>;
 }
 
 /** Renders a named group of smoothly scrollable library cards. */
@@ -119,6 +126,11 @@ function LibrarySection({ title, items, className }: { readonly title: string; r
 /** Restores the lightweight PCB reading list on the home page. */
 function TrendingPcbBlogs() {
   return <section className={styles.trendingBlogs} aria-labelledby="trending-pcb-blogs"><h2 id="trending-pcb-blogs" className={styles.trendingHeading}>Trending PCB blogs</h2><div className={styles.trendingGrid}>{trendingPcbBlogs.map((blog) => <article key={blog.title} className={styles.trendingCard}><p className={styles.trendingTitle}>{blog.title}</p><span className={styles.trendingClicks}>{blog.clicks}</span></article>)}</div></section>;
+}
+
+/** Renders the home library footer and supporting links. */
+function WorkspaceFooter() {
+  return <footer className={styles.footer}><div className={styles.footerContent}><section className={styles.footerBrand}><strong>tscircuit</strong><p>Electronics, engineered with code.</p></section>{footerColumns.map((column) => <section key={column.title} className={styles.footerColumn}><h2>{column.title}</h2><ul>{column.links.map((link) => <li key={link}>{link}</li>)}</ul></section>)}</div><p className={styles.footerCopyright}>© 2026 tscircuit, Inc.</p></footer>;
 }
 
 /** Cycles through the welcome prompts at a calm, readable pace. */
