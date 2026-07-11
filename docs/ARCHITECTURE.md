@@ -6,9 +6,9 @@ This is a dark-only local-first engineering workspace. The initial prompt starts
 
 ## Ownership and data flow
 
-`app/page.tsx` is a server component and renders the client boundary at `components/workspace/workspace.tsx`. That component owns selected-view, active-tab, and thread state; its small composed children render the rail, thread panel, composer, and canvas.
+`app/page.tsx` is a server component and renders the client boundary at `components/workspace/workspace.tsx`. The current screen, home context, opaque project thread ID, and active artefact tab are URL-backed; its small composed children render the rail, thread panel, composer, and canvas.
 
-`lib/chat-thread-store.ts` is the single persistence boundary. It stores versioned threads under `eleqon.chat-threads.v1` in browser localStorage. The client workspace reads it only in the browser and persists updates after rendering.
+`lib/workspace-url-state.ts` owns the typed parse/serialize boundary for reproducible URLs. `lib/chat-thread-store.ts` remains the local history cache, storing versioned threads under `eleqon.chat-threads.v1` in browser localStorage.
 
 ## Extension points
 

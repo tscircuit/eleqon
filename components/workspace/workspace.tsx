@@ -3,13 +3,11 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { createChatThread, parseChatThreadTitle, type ChatThread } from "@/lib/chat-thread";
 import { ChatThreadStore } from "@/lib/chat-thread-store";
+import { parseWorkspaceUrlState, serializeWorkspaceUrlState, type HomeTab, type WorkspaceTab, type WorkspaceUrlState } from "@/lib/workspace-url-state";
 import { ArrowIcon, BoardIcon, CodeIcon, CubeIcon, HistoryIcon, PlusIcon, SchematicIcon } from "./icons";
 import { Brand } from "./brand";
 import styles from "./workspace.module.css";
 
-type WorkspaceTab = "code" | "pcb" | "schematic" | "model";
-type View = { readonly kind: "welcome" } | { readonly kind: "thread"; readonly threadId: ChatThread["id"] };
-type HomeTab = "agent" | "docs";
 type LibraryItem = Readonly<{ readonly title: string; readonly detail: string }>;
 type LibraryItems = readonly [LibraryItem, ...LibraryItem[]];
 
@@ -58,36 +56,37 @@ const footerColumns = [
 /** Manages local threads and composes the workspace views. */
 export function Workspace() {
   const [threads, setThreads] = useState<ReadonlyArray<ChatThread>>(() => typeof window === "undefined" ? [] : new ChatThreadStore(window.localStorage).read());
-  const [view, setView] = useState<View>({ kind: "welcome" });
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>("code");
-  const [homeTab, setHomeTab] = useState<HomeTab>("agent");
+  const [workspaceState, setWorkspaceState] = useState<WorkspaceUrlState>(() => typeof window === "undefined" ? { kind: "home", homeTab: "agent" } : parseWorkspaceUrlState(window.location.search));
   const [, startTransition] = useTransition();
 
-  useEffect(() => { const store = new ChatThreadStore(window.localStorage); threads.toReversed().forEach((thread) => store.save(thread)); }, [threads]);
+  useEffect(() => { const restoreWorkspaceState = () => setWorkspaceState(parseWorkspaceUrlState(window.location.search)); window.addEventListener("popstate", restoreWorkspaceState); return () => window.removeEventListener("popstate", restoreWorkspaceState); }, []);
 
-  const startThread = () => { setHomeTab("agent"); setView({ kind: "welcome" }); };
-  const selectThread = (threadId: ChatThread["id"]) => setView({ kind: "thread", threadId });
+  const navigate = (state: WorkspaceUrlState) => { window.history.pushState(null, "", `${window.location.pathname}${serializeWorkspaceUrlState(state)}`); setWorkspaceState(state); };
+  const startThread = () => navigate({ kind: "home", homeTab: "agent" });
+  const selectThread = (thread: ChatThread) => navigate({ kind: "project", threadId: thread.id, activeTab: "code" });
   const submit = (prompt: string) => {
     startTransition(() => {
       const title = parseChatThreadTitle(prompt);
       if (title === null) return;
       const thread = createChatThread(title);
+      new ChatThreadStore(window.localStorage).save(thread);
       setThreads((current) => [thread, ...current]);
-      setView({ kind: "thread", threadId: thread.id });
+      navigate({ kind: "project", threadId: thread.id, activeTab: "code" });
     });
   };
+  const selectedThread = workspaceState.kind === "project" ? threads.find((thread) => thread.id === workspaceState.threadId) : undefined;
 
   return (
-    <div className={styles.workspace} data-view={view.kind}>
-      {view.kind === "welcome" ? <HomeNotch activeTab={homeTab} onSelect={setHomeTab} /> : null}
+    <div className={styles.workspace} data-view={workspaceState.kind}>
+      {workspaceState.kind === "home" ? <HomeNotch activeTab={workspaceState.homeTab} onSelect={(homeTab) => navigate({ kind: "home", homeTab })} /> : null}
       <nav className={styles.rail} aria-label="Workspace navigation">
         <Brand className={styles.brand} />
-        <RailButton label="New" icon={<PlusIcon />} onClick={startThread} active={view.kind === "welcome"} />
-        <RailButton label="History" icon={<HistoryIcon />} onClick={() => { const latest = threads[0]; if (latest) selectThread(latest.id); }} active={view.kind === "thread"} />
+        <RailButton label="New" icon={<PlusIcon />} onClick={startThread} active={workspaceState.kind === "home"} />
+        <RailButton label="History" icon={<HistoryIcon />} onClick={() => { const latest = threads[0]; if (latest) selectThread(latest); }} active={workspaceState.kind === "project"} />
       </nav>
       <main className={styles.main}>
-        {view.kind === "welcome" ? homeTab === "agent" ? <Welcome onSubmit={submit} /> : <DocsPage onSubmit={submit} /> : (
-          <ProjectView activeTab={activeTab} thread={threads.find((thread) => thread.id === view.threadId)} onSubmit={submit} onTab={setActiveTab} />
+        {workspaceState.kind === "home" ? workspaceState.homeTab === "agent" ? <Welcome onSubmit={submit} /> : <DocsPage onSubmit={submit} /> : (
+          <ProjectView activeTab={workspaceState.activeTab} thread={selectedThread} onSubmit={submit} onTab={(activeTab) => navigate({ ...workspaceState, activeTab })} />
         )}
       </main>
     </div>

@@ -1,9 +1,8 @@
 import type {
   ChatThread,
-  ChatThreadId,
   ChatThreadTimestamp,
-  ChatThreadTitle,
 } from "./chat-thread";
+import { parseChatThreadId, parseChatThreadTitle } from "./chat-thread";
 
 const CHAT_THREADS_STORAGE_KEY = "eleqon.chat-threads.v1";
 
@@ -52,9 +51,15 @@ function parseChatThread(value: unknown): ReadonlyArray<ChatThread> {
     return [];
   }
 
+  const id = parseChatThreadId(value.id);
+  const title = parseChatThreadTitle(value.title);
+  if (id === null || title === null) {
+    return [];
+  }
+
   return [{
-    id: toChatThreadId(value.id),
-    title: toChatThreadTitle(value.title),
+    id,
+    title,
     createdAt: toChatThreadTimestamp(value.createdAt),
     updatedAt: toChatThreadTimestamp(value.updatedAt),
   }];
@@ -79,18 +84,6 @@ function isThreadRecord(
     typeof record.updatedAt === "string" &&
     Number.isFinite(Date.parse(record.updatedAt))
   );
-}
-
-/** Brand an identifier that has passed the persistence boundary. */
-function toChatThreadId(value: string): ChatThreadId {
-  // SAFETY: isThreadRecord verifies that persisted IDs are non-empty strings.
-  return value as ChatThreadId;
-}
-
-/** Brand a title that has passed the persistence boundary. */
-function toChatThreadTitle(value: string): ChatThreadTitle {
-  // SAFETY: isThreadRecord verifies that persisted titles contain visible text.
-  return value as ChatThreadTitle;
 }
 
 /** Brand a timestamp that has passed the persistence boundary. */

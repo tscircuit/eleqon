@@ -28,6 +28,16 @@ export function parseChatThreadTitle(prompt: string): ChatThreadTitle | null {
   return title as ChatThreadTitle;
 }
 
+/** Parse an opaque UUID from a URL or persistence boundary. */
+export function parseChatThreadId(value: string): ChatThreadId | null {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)) {
+    return null;
+  }
+
+  // SAFETY: the expression above accepts only canonical UUID-shaped opaque identifiers.
+  return value as ChatThreadId;
+}
+
 /** Create a new thread with a generated identifier and timestamp. */
 export function createChatThread(
   title: ChatThreadTitle,
