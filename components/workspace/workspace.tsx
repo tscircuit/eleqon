@@ -9,6 +9,7 @@ import styles from "./workspace.module.css";
 
 type WorkspaceTab = "code" | "pcb" | "schematic" | "model";
 type View = { readonly kind: "welcome" } | { readonly kind: "thread"; readonly threadId: ChatThread["id"] };
+type NotchTab = "agent" | "docs";
 
 const tabs: ReadonlyArray<{ readonly id: WorkspaceTab; readonly label: string; readonly icon: typeof CodeIcon }> = [
   { id: "code", label: "Code", icon: CodeIcon },
@@ -28,6 +29,7 @@ export function Workspace() {
   const [threads, setThreads] = useState<ReadonlyArray<ChatThread>>(() => typeof window === "undefined" ? [] : new ChatThreadStore(window.localStorage).read());
   const [view, setView] = useState<View>({ kind: "welcome" });
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("code");
+  const [notchTab, setNotchTab] = useState<NotchTab>("agent");
   const [, startTransition] = useTransition();
 
   useEffect(() => { const store = new ChatThreadStore(window.localStorage); threads.toReversed().forEach((thread) => store.save(thread)); }, [threads]);
@@ -46,6 +48,7 @@ export function Workspace() {
 
   return (
     <div className={styles.workspace} data-view={view.kind}>
+      <WorkspaceNotch activeTab={notchTab} onSelect={setNotchTab} />
       <nav className={styles.rail} aria-label="Workspace navigation">
         <Brand className={styles.brand} />
         <RailButton label="New" icon={<PlusIcon />} onClick={startThread} active={view.kind === "welcome"} />
@@ -58,6 +61,11 @@ export function Workspace() {
       </main>
     </div>
   );
+}
+
+/** Switches between the active agent and documentation context. */
+function WorkspaceNotch({ activeTab, onSelect }: { readonly activeTab: NotchTab; readonly onSelect: (tab: NotchTab) => void }) {
+  return <div className={styles.notch} role="tablist" aria-label="Workspace context"><button className={styles.notchButton} data-active={activeTab === "agent"} type="button" role="tab" aria-selected={activeTab === "agent"} onClick={() => onSelect("agent")}>Agent</button><button className={styles.notchButton} data-active={activeTab === "docs"} type="button" role="tab" aria-selected={activeTab === "docs"} onClick={() => onSelect("docs")}>Docs</button></div>;
 }
 
 /** Renders a rail navigation control. */
@@ -75,8 +83,21 @@ function WelcomeHeadline() {
   const [promptIndex, setPromptIndex] = useState(0);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setPromptIndex((current) => (current + 1) % welcomePrompts.length), 3000);
-    return () => window.clearInterval(timer);
+    let currentIndex = 0;
+    let hasPausedOnBuildPrompt = false;
+    let timer = 0;
+    const showNextPrompt = () => {
+      const delay = currentIndex === 0 && hasPausedOnBuildPrompt ? 30000 : 3000;
+      timer = window.setTimeout(() => {
+        currentIndex = (currentIndex + 1) % welcomePrompts.length;
+        hasPausedOnBuildPrompt ||= currentIndex === 0;
+        setPromptIndex(currentIndex);
+        showNextPrompt();
+      }, delay);
+    };
+
+    showNextPrompt();
+    return () => window.clearTimeout(timer);
   }, []);
 
   const prompt = welcomePrompts[promptIndex];
