@@ -4,7 +4,7 @@ import type {
 } from "./chat-thread";
 import { parseChatThreadId, parseChatThreadTitle } from "./chat-thread";
 
-const CHAT_THREADS_STORAGE_KEY = "eleqon.chat-threads.v1";
+const CHAT_THREADS_STORAGE_KEY = "tscircuit.chat-threads.v1";
 
 /** The minimum storage API required to persist chat threads. */
 export type ChatThreadStorage = Pick<Storage, "getItem" | "setItem">;

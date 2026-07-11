@@ -7,5 +7,5 @@
 component with `new ChatThreadStore(window.localStorage)`, call `read()` during
 initialization, and call `save(thread)` after a valid prompt is submitted.
 
-The versioned local-storage key is `eleqon.chat-threads.v1`. Reads discard
+The versioned local-storage key is `tscircuit.chat-threads.v1`. Reads discard
 malformed records so UI code only receives valid, newest-first threads.

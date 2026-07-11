@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "eleqon",
+      "name": "tscircuit",
       "dependencies": {
         "next": "16.2.10",
         "react": "19.2.4",

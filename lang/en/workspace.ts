@@ -6,12 +6,12 @@ type LibraryItem = Readonly<{ readonly title: string; readonly detail: string }>
 /** All rendered English copy for the workspace. */
 export const enWorkspace = {
   app: {
-    title: "Eleqon",
+    title: "tscircuit",
     description: "A local-first engineering workspace",
     language: "en",
   },
   brand: {
-    mark: "e",
+    mark: "t",
     productName: "tscircuit",
     docsName: "tscircuit docs",
   },
@@ -78,7 +78,7 @@ export const enWorkspace = {
     ],
   },
   aria: {
-    brand: "Eleqon",
+    brand: "tscircuit",
     workspaceNavigation: "Workspace navigation",
     homeContext: "Home context",
     newChat: "New",
