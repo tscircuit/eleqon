@@ -4,8 +4,8 @@
 .railButton { display:grid; width:58px; height:58px; place-items:center; border:0; border-radius:14px; background:transparent; color:#838383; cursor:pointer; }
 .railButton:hover, .railButton[data-active="true"] { color:#f5f5f5; background:#1b1b1b; }
 .railButton svg { width:27px; height:27px; }
-.notch { position:fixed; z-index:10; top:0; left:50%; display:flex; gap:6px; transform:translateX(-50%); border-radius:0 0 22px 22px; background:#141414; padding:9px 12px 12px; }
-.notchButton { border:0; border-radius:14px; background:transparent; padding:10px 20px; color:#8a8a8a; cursor:pointer; font-size:16px; font-weight:600; line-height:1; }
+.notch { position:fixed; z-index:10; top:0; left:50%; display:flex; gap:8px; transform:translateX(-50%); border-radius:0 0 26px 26px; background:#101010; padding:12px 16px 16px; }
+.notchButton { border:0; border-radius:17px; background:transparent; padding:12px 26px; color:#8a8a8a; cursor:pointer; font-size:18px; font-weight:600; line-height:1; }
 .notchButton[data-active="true"] { background:#1f1f1f; color:#f4f4f4; }
 .main { min-width:0; padding:20px 26px 20px 10px; }
 .frame { display:grid; min-height:calc(100vh - 40px); overflow:hidden; border:0; border-radius:22px; background:#141414; }
