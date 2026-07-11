@@ -47,6 +47,6 @@
 .workspace[data-view="welcome"] .send { position:static; width:58px; height:58px; border-radius:50%; background:#454545; color:#191919; }
 .workspace[data-view="welcome"] .send:disabled { background:#454545; color:#202020; }
 .workspace[data-view="welcome"] .send svg { width:28px; height:28px; stroke-width:2; }
-@keyframes welcome-prompt { 0% { filter:blur(10px); opacity:0; transform:translateY(8px); } 14%, 82% { filter:blur(0); opacity:1; transform:translateY(0); } 100% { filter:blur(10px); opacity:0; transform:translateY(-8px); } }
+@keyframes welcome-prompt { 0% { filter:blur(10px); opacity:0; transform:translateY(8px); } 16%, 100% { filter:blur(0); opacity:1; transform:translateY(0); } }
 @media (prefers-reduced-motion:reduce) { .welcomeHeadlineText { animation:none; } }
 @media (max-width:700px) { .workspace { grid-template-columns:1fr; } .rail { position:fixed; z-index:2; right:12px; bottom:12px; top:auto; height:auto; flex-direction:row; border:0; border-radius:16px; padding:7px; background:#181818; } .rail .brand { display:none; } .railButton { width:45px; min-height:42px; } .main { padding:10px; } .frame { min-height:calc(100vh - 20px); border-radius:16px; } .project { grid-template-columns:1fr; padding:12px; } .threadPanel { display:none; } .tabs { overflow:auto; justify-content:flex-start; padding:14px; } .content { padding:0 18px 90px; } }
