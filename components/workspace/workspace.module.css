@@ -9,8 +9,9 @@
 .notchButton[data-active="true"] { background:#1f1f1f; color:#f4f4f4; }
 .main { min-width:0; padding:20px 26px 20px 10px; }
 .frame { display:grid; min-height:calc(100vh - 40px); overflow:hidden; border:0; border-radius:22px; background:#141414; }
-.welcome { place-items:center; }
-.composerWrap { width:min(1440px, calc(100% - 96px)); margin-top:-4vh; }
+.welcome { position:relative; display:block; height:calc(100vh - 40px); overflow-y:auto; }
+.homeContent { min-height:100%; padding:clamp(300px, 40vh, 520px) 0 96px; }
+.composerWrap { width:min(1440px, calc(100% - 96px)); margin:-4vh auto 0; }
 .welcomeHeadline { min-height:72px; margin:0 0 24px 8px; color:#f2f2f2; font-size:clamp(38px, 3vw, 52px); font-weight:600; letter-spacing:-.045em; line-height:1.15; }
 .welcomeHeadlineText { display:block; animation:welcome-prompt 3s ease-in-out both; }
 .composer { position:relative; border:0; border-radius:22px; background:#1d1d1d; padding:15px 63px 15px 18px; }
@@ -51,12 +52,35 @@
 .welcome .send { position:static; width:58px; height:58px; border-radius:50%; background:#454545; color:#191919; }
 .welcome .send:disabled { background:#454545; color:#202020; }
 .welcome .send svg { width:28px; height:28px; stroke-width:2; }
-.trendingBlogs { margin-top:32px; }
-.trendingHeading { margin:0 0 14px; color:#e7e7e7; font-size:20px; font-weight:600; letter-spacing:-.02em; }
-.trendingGrid { display:grid; gap:4px; }
-.trendingCard { display:flex; align-items:baseline; justify-content:space-between; gap:24px; padding:10px 0; }
-.trendingTitle { margin:0; color:#e3e3e3; font-size:18px; font-weight:500; letter-spacing:-.02em; line-height:1.35; }
-.trendingClicks { flex:0 0 auto; color:#929292; font-size:14px; font-weight:500; }
+.homeLibrary { display:grid; gap:64px; margin-top:max(164px, calc(100vh - 1026px)); }
+.featuredStory { position:relative; display:grid; grid-template-columns:minmax(0, 1fr) minmax(320px, .88fr); min-height:40vh; overflow:hidden; border-radius:24px; background:#1a1a1a; }
+.featuredStory[data-faded="true"]::after { position:absolute; right:0; bottom:0; left:0; height:180px; content:""; backdrop-filter:blur(12px); background:linear-gradient(180deg, rgba(18, 18, 18, 0), rgba(18, 18, 18, .98)); pointer-events:none; }
+.featuredVisual { position:relative; display:grid; place-items:center; overflow:hidden; background:radial-gradient(circle at 35% 30%, #3a3a3a 0, #202020 42%, #141414 74%); color:#ebebeb; font-size:32px; font-weight:600; letter-spacing:-.05em; }
+.featuredVisual::before, .featuredVisual::after { position:absolute; content:""; border:1px solid rgba(255, 255, 255, .12); border-radius:50%; }
+.featuredVisual::before { width:70%; aspect-ratio:1; }
+.featuredVisual::after { width:46%; aspect-ratio:1; }
+.featuredVisual span { position:relative; z-index:1; }
+.featuredCopy { display:flex; flex-direction:column; justify-content:flex-start; padding:48px; background:#1b1b1b; }
+.featuredCopy h2, .librarySection h2 { margin:0; color:#f1f1f1; font-size:42px; font-weight:600; letter-spacing:-.045em; line-height:1.1; }
+.featuredCopy p { margin:24px 0 0; color:#ababab; font-size:21px; line-height:1.55; }
+.librarySection { min-width:0; }
+.libraryHeader { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.librarySection h2 { margin:0; font-size:28px; }
+.libraryControls { display:flex; gap:8px; }
+.libraryControl { display:grid; width:42px; height:42px; place-items:center; border:0; border-radius:12px; background:#222; color:#eeeeee; cursor:pointer; font-size:22px; line-height:1; }
+.libraryControl:hover { background:#303030; }
+.researchGrid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:20px; }
+.boardGrid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:24px; }
+.libraryCard { overflow:hidden; border-radius:20px; background:#1b1b1b; padding:22px; }
+.researchGrid .libraryCard { min-height:300px; }
+.boardGrid .libraryCard { min-height:420px; padding:26px; }
+.cardVisual { height:166px; margin:-22px -22px 24px; background:linear-gradient(135deg, #303030, #202020 52%, #151515); }
+.boardGrid .cardVisual { height:236px; margin:-26px -26px 28px; }
+.libraryCard:nth-child(2n) .cardVisual { background:linear-gradient(135deg, #3a3a3a, #242424 52%, #151515); }
+.libraryCard h3 { margin:0; color:#eeeeee; font-size:24px; font-weight:600; letter-spacing:-.03em; }
+.boardGrid .libraryCard h3 { font-size:30px; }
+.libraryCard p { margin:10px 0 0; color:#9d9d9d; font-size:17px; line-height:1.45; }
+.boardGrid .libraryCard p { font-size:19px; }
 @keyframes welcome-prompt { 0% { filter:blur(10px); opacity:0; transform:translateY(8px); } 16%, 100% { filter:blur(0); opacity:1; transform:translateY(0); } }
 @media (prefers-reduced-motion:reduce) { .welcomeHeadlineText { animation:none; } }
-@media (max-width:700px) { .workspace { grid-template-columns:1fr; } .rail { position:fixed; z-index:2; right:12px; bottom:12px; top:auto; height:auto; flex-direction:row; border:0; border-radius:16px; padding:7px; background:#181818; } .rail .brand { display:none; } .railButton { width:45px; min-height:42px; } .main { padding:10px; } .frame { min-height:calc(100vh - 20px); border-radius:16px; } .project { grid-template-columns:1fr; padding:12px; } .chatPanel { display:none; } .tabs { overflow:auto; justify-content:flex-start; padding:14px; } .content { padding:0 18px 90px; } }
+@media (max-width:700px) { .workspace { grid-template-columns:1fr; } .rail { position:fixed; z-index:2; right:12px; bottom:12px; top:auto; height:auto; flex-direction:row; border:0; border-radius:16px; padding:7px; background:#181818; } .rail .brand { display:none; } .railButton { width:45px; min-height:42px; } .main { padding:10px; } .frame { min-height:calc(100vh - 20px); border-radius:16px; } .homeContent { padding:128px 0 96px; } .composerWrap { width:calc(100% - 32px); } .featuredStory { grid-template-columns:1fr; } .featuredVisual { min-height:220px; } .featuredCopy { padding:28px; } .researchGrid, .boardGrid { grid-template-columns:repeat(2, minmax(0, 1fr)); } .project { grid-template-columns:1fr; padding:12px; } .chatPanel { display:none; } .tabs { overflow:auto; justify-content:flex-start; padding:14px; } .content { padding:0 18px 90px; } }

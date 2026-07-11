@@ -10,6 +10,9 @@ import styles from "./workspace.module.css";
 type WorkspaceTab = "code" | "pcb" | "schematic" | "model";
 type View = { readonly kind: "welcome" } | { readonly kind: "thread"; readonly threadId: ChatThread["id"] };
 type HomeTab = "agent" | "docs";
+type LibraryItem = Readonly<{ readonly title: string; readonly detail: string }>;
+type LibraryItems = readonly [LibraryItem, ...LibraryItem[]];
+type VisibleCardCount = 3 | 4;
 
 const tabs: ReadonlyArray<{ readonly id: WorkspaceTab; readonly label: string; readonly icon: typeof CodeIcon }> = [
   { id: "code", label: "Code", icon: CodeIcon },
@@ -24,10 +27,20 @@ const welcomePrompts = [
   "Are vias allowed in a PCB?",
 ] as const;
 
-const trendingPcbBlogs = [
-  { title: "PCB trace widths: a practical guide", clicks: "42K clicks" },
-  { title: "Routing differential pairs without guesswork", clicks: "31K clicks" },
-  { title: "Ground pours that make your board quieter", clicks: "20K clicks" },
+const researchItems = [
+  { title: "Autorouter", detail: "Route your board in minutes" },
+  { title: "Differential pairs", detail: "Match high-speed signals" },
+  { title: "Design rules", detail: "Make constraints explicit" },
+  { title: "Component search", detail: "Find parts that fit" },
+  { title: "BOM tools", detail: "Keep sourcing organized" },
+  { title: "3D preview", detail: "Inspect the completed board" },
+] as const;
+
+const orderedBoards = [
+  { title: "Sensor hub", detail: "Four-layer controller" },
+  { title: "USB interface", detail: "Compact reference board" },
+  { title: "Motor driver", detail: "Power and control layout" },
+  { title: "Audio module", detail: "Low-noise signal path" },
 ] as const;
 
 /** Manages local threads and composes the workspace views. */
@@ -81,12 +94,23 @@ function RailButton({ label, icon, onClick, active }: { readonly label: string; 
 
 /** Renders the first-chat prompt. */
 function Welcome({ onSubmit }: { readonly onSubmit: (prompt: string) => void }) {
-  return <section className={`${styles.frame} ${styles.welcome}`}><div className={styles.composerWrap}><WelcomeHeadline /><Composer onSubmit={onSubmit} /><TrendingPcbBlogs /></div></section>;
+  const [atTop, setAtTop] = useState(true);
+  return <section className={`${styles.frame} ${styles.welcome}`} onScroll={(event) => setAtTop(event.currentTarget.scrollTop < 24)}><div className={styles.homeContent}><div className={styles.composerWrap}><WelcomeHeadline /><Composer onSubmit={onSubmit} /><HomeLibrary showFeatureFade={atTop} /></div></div></section>;
 }
 
-/** Renders lightweight, popular PCB reading suggestions. */
-function TrendingPcbBlogs() {
-  return <section className={styles.trendingBlogs} aria-labelledby="trending-pcb-blogs"><h2 id="trending-pcb-blogs" className={styles.trendingHeading}>Trending PCB blogs</h2><div className={styles.trendingGrid}>{trendingPcbBlogs.map((blog) => <article key={blog.title} className={styles.trendingCard}><p className={styles.trendingTitle}>{blog.title}</p><span className={styles.trendingClicks}>{blog.clicks}</span></article>)}</div></section>;
+/** Renders the featured explainer and browsable tscircuit work. */
+function HomeLibrary({ showFeatureFade }: { readonly showFeatureFade: boolean }) {
+  return <div className={styles.homeLibrary}><section className={styles.featuredStory} data-faded={showFeatureFade}><div className={styles.featuredVisual} aria-hidden="true"><span>tscircuit</span></div><article className={styles.featuredCopy}><h2>What is tscircuit framework?</h2><p>tscircuit is a toolkit for designing electronics with code. Define components, connections, board constraints, and manufacturing details in one workflow. It helps teams move from an idea to a reviewable PCB without losing the reasoning behind each design choice.</p></article></section><LibrarySection title="Research" items={researchItems} visibleCount={4} className={styles.researchGrid} /><LibrarySection title="Ordered boards" items={orderedBoards} visibleCount={3} className={styles.boardGrid} /></div>;
+}
+
+/** Renders a named group of compact library cards. */
+function LibrarySection({ title, items, visibleCount, className }: { readonly title: string; readonly items: LibraryItems; readonly visibleCount: VisibleCardCount; readonly className: string }) {
+  const [startIndex, setStartIndex] = useState(0);
+  const shownItems = Array.from({ length: visibleCount }, (_, offset) => items[(startIndex + offset) % items.length]);
+  const showPrevious = () => setStartIndex((current) => (current + items.length - 1) % items.length);
+  const showNext = () => setStartIndex((current) => (current + 1) % items.length);
+
+  return <section className={styles.librarySection}><div className={styles.libraryHeader}><h2>{title}</h2><div className={styles.libraryControls}><button className={styles.libraryControl} type="button" onClick={showPrevious} aria-label={`Previous ${title}`}>←</button><button className={styles.libraryControl} type="button" onClick={showNext} aria-label={`Next ${title}`}>→</button></div></div><div className={className}>{shownItems.map((item) => <article key={item.title} className={styles.libraryCard}><div className={styles.cardVisual} aria-hidden="true" /><h3>{item.title}</h3><p>{item.detail}</p></article>)}</div></section>;
 }
 
 /** Cycles through the welcome prompts at a calm, readable pace. */
