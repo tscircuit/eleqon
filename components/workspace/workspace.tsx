@@ -9,7 +9,6 @@ import styles from "./workspace.module.css";
 
 type WorkspaceTab = "code" | "pcb" | "schematic" | "model";
 type View = { readonly kind: "welcome" } | { readonly kind: "thread"; readonly threadId: ChatThread["id"] };
-type NotchTab = "agent" | "docs";
 
 const tabs: ReadonlyArray<{ readonly id: WorkspaceTab; readonly label: string; readonly icon: typeof CodeIcon }> = [
   { id: "code", label: "Code", icon: CodeIcon },
@@ -35,7 +34,6 @@ export function Workspace() {
   const [threads, setThreads] = useState<ReadonlyArray<ChatThread>>(() => typeof window === "undefined" ? [] : new ChatThreadStore(window.localStorage).read());
   const [view, setView] = useState<View>({ kind: "welcome" });
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("code");
-  const [notchTab, setNotchTab] = useState<NotchTab>("agent");
   const [, startTransition] = useTransition();
 
   useEffect(() => { const store = new ChatThreadStore(window.localStorage); threads.toReversed().forEach((thread) => store.save(thread)); }, [threads]);
@@ -54,7 +52,6 @@ export function Workspace() {
 
   return (
     <div className={styles.workspace} data-view={view.kind}>
-      <WorkspaceNotch activeTab={notchTab} onSelect={setNotchTab} />
       <nav className={styles.rail} aria-label="Workspace navigation">
         <Brand className={styles.brand} />
         <RailButton label="New" icon={<PlusIcon />} onClick={startThread} active={view.kind === "welcome"} />
@@ -62,16 +59,11 @@ export function Workspace() {
       </nav>
       <main className={styles.main}>
         {view.kind === "welcome" ? <Welcome onSubmit={submit} /> : (
-          <ProjectView threads={threads} selectedId={view.threadId} activeTab={activeTab} onNew={startThread} onSelect={selectThread} onTab={setActiveTab} />
+          <ProjectView activeTab={activeTab} onSubmit={submit} onTab={setActiveTab} />
         )}
       </main>
     </div>
   );
-}
-
-/** Switches between the active agent and documentation context. */
-function WorkspaceNotch({ activeTab, onSelect }: { readonly activeTab: NotchTab; readonly onSelect: (tab: NotchTab) => void }) {
-  return <div className={styles.notch} role="tablist" aria-label="Workspace context"><button className={styles.notchButton} data-active={activeTab === "agent"} type="button" role="tab" aria-selected={activeTab === "agent"} onClick={() => onSelect("agent")}>Agent</button><button className={styles.notchButton} data-active={activeTab === "docs"} type="button" role="tab" aria-selected={activeTab === "docs"} onClick={() => onSelect("docs")}>Docs</button></div>;
 }
 
 /** Renders a rail navigation control. */
@@ -115,15 +107,9 @@ function WelcomeHeadline() {
   return <h1 className={styles.welcomeHeadline}><span key={prompt} className={styles.welcomeHeadlineText}>{prompt}</span></h1>;
 }
 
-/** Renders an active engineering thread. */
-function ProjectView({ threads, selectedId, activeTab, onNew, onSelect, onTab }: { readonly threads: ReadonlyArray<ChatThread>; readonly selectedId: ChatThread["id"]; readonly activeTab: WorkspaceTab; readonly onNew: () => void; readonly onSelect: (id: ChatThread["id"]) => void; readonly onTab: (tab: WorkspaceTab) => void }) {
-  const selected = threads.find((thread) => thread.id === selectedId);
-  return <section className={`${styles.frame} ${styles.project}`}><aside className={styles.threadPanel}><p className={styles.threadTitle}>Threads</p><div className={styles.threadList}>{threads.map((thread) => <button key={thread.id} type="button" className={styles.thread} data-selected={selectedId === thread.id} onClick={() => onSelect(thread.id)}>{thread.title}</button>)}</div><button className={styles.newThread} type="button" onClick={onNew}>+ New chat</button></aside><section className={styles.canvas}><div className={styles.tabs} role="tablist" aria-label="Build artefacts">{tabs.map(({ id, label, icon: Icon }) => <button key={id} className={styles.tab} data-active={activeTab === id} type="button" role="tab" aria-selected={activeTab === id} onClick={() => onTab(id)}><Icon />{label}</button>)}</div><div className={styles.content}>{selected ? <Thread thread={selected} activeTab={activeTab} /> : null}</div></section></section>;
-}
-
-/** Displays messages and a compact follow-up composer. */
-function Thread({ thread, activeTab }: { readonly thread: ChatThread; readonly activeTab: WorkspaceTab }) {
-  return <><article className={styles.message}><span className={styles.author}>Project brief</span>{thread.title}</article><article className={`${styles.message} ${styles.assistant}`}><span className={styles.author}>Eleqon</span>Project created. Choose a workspace tab to begin building.</article><p className={styles.workspaceNote}>The {activeTab === "model" ? "3D model" : activeTab} workspace will appear here as the project develops.</p></>;
+/** Renders the split chat and engineering workspace. */
+function ProjectView({ activeTab, onSubmit, onTab }: { readonly activeTab: WorkspaceTab; readonly onSubmit: (prompt: string) => void; readonly onTab: (tab: WorkspaceTab) => void }) {
+  return <section className={`${styles.frame} ${styles.project}`}><aside className={styles.chatPanel} aria-label="Chat area"><div className={styles.chatArea} /><div className={styles.chatInput}><Composer onSubmit={onSubmit} /></div></aside><section className={styles.canvas}><div className={styles.tabs} role="tablist" aria-label="Build artefacts">{tabs.map(({ id, label, icon: Icon }) => <button key={id} className={styles.tab} data-active={activeTab === id} type="button" role="tab" aria-selected={activeTab === id} onClick={() => onTab(id)}><Icon />{label}</button>)}</div><div className={styles.content} /></section></section>;
 }
 
 /** Captures a non-empty build prompt. */
