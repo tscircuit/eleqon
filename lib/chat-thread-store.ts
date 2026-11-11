@@ -20,7 +20,9 @@ export class ChatThreadStore {
       return [];
     }
 
-    return parseChatThreads(rawThreads);
+    return [...parseChatThreads(rawThreads)].sort(
+      (left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt),
+    );
   }
 
   /** Add a thread to the front of persisted history. */
